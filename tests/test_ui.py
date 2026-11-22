@@ -269,3 +269,107 @@ def test_editeur_reserve_a_l_admin_et_cree_une_carte(site, navigateur, monkeypat
     assert "créée" in texte or "Seulement" in texte                      # créée, ou refus clair faute d'images
     assert not page.erreurs
     ctx.close()
+
+
+# ------------------------------------------------------------ étape 3 : salons (WebSocket relayé par tests/ws_shim.py)
+
+@pytest.fixture
+def site_salon():
+    import asyncio
+    import uvicorn
+    from serveur.app import creer_app
+    from tests.ws_shim import serveur_relais
+
+    def port_libre():
+        s = socket.socket(); s.bind(("127.0.0.1", 0)); p = s.getsockname()[1]; s.close(); return p
+    p_uvicorn, p_site = port_libre(), port_libre()
+    app = creer_app()
+    serveur = uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=p_uvicorn, log_level="error"))
+    etat = {}
+
+    async def principal():
+        relais = await asyncio.start_server(serveur_relais(app, p_uvicorn), "127.0.0.1", p_site)
+        etat["pret"] = True
+        await serveur.serve()
+        relais.close()
+    fil = threading.Thread(target=lambda: asyncio.run(principal()), daemon=True); fil.start()
+    for _ in range(100):
+        if serveur.started and etat.get("pret"):
+            break
+        time.sleep(0.05)
+    yield f"http://127.0.0.1:{p_site}"
+    serveur.should_exit = True
+    fil.join(5)
+
+
+def entrer_salon(page, site, code, pseudo, spectateur=False):
+    page.goto(site)
+    page.wait_for_selector("#form-salon")
+    page.fill('#form-salon input[name="code"]', code)
+    if spectateur:
+        page.check('#form-salon input[name="spectateur"]')
+    page.click("#form-salon button")
+    page.fill('#entree input[name="pseudo"]', pseudo)
+    page.click("#entree button")
+
+
+def test_salon_a_deux_avec_chat_et_spectateur(site_salon, navigateur):  # critères 21, 22, 26, 28
+    site = site_salon
+    ctx_a, a = nouvelle_page(navigateur, site)
+    ctx_b, b = nouvelle_page(navigateur, site)
+    ctx_s, s = nouvelle_page(navigateur, site)
+    a.goto(site)
+    a.wait_for_selector(".modes")
+    a.click('.mode[data-mode="salon"]')
+    a.select_option('select[name="carte"]', "drome-ardeche")
+    a.click("#jouer")
+    a.fill('#entree input[name="pseudo"]', "Hôte")
+    a.click("#entree button")
+    a.wait_for_selector("#code-salon")
+    code = a.inner_text("#code-salon").strip()
+    assert len(code) == 6
+    assert a.locator("#lancer").is_disabled()                          # il faut 2 joueurs
+    a.check("#verrou"); a.wait_for_timeout(200); a.uncheck("#verrou")  # verrouiller puis rouvrir marche
+
+    entrer_salon(b, site, code.lower(), "Ami")
+    entrer_salon(s, site, code, "Curieux", spectateur=True)
+    a.wait_for_selector("#lancer:not([disabled])")
+    assert "Curieux" in a.inner_text(".membres") and "spectateur" in a.inner_text(".membres")
+    b.wait_for_selector(".membres")
+    assert b.locator("#lancer").count() == 0                           # seul l'hôte lance
+
+    # chat : l'ami écrit, tous le voient (hôte, spectateur) ; le texte reste du texte
+    b.click("#chat-bascule")
+    b.fill("#chat-texte", "Salut <b>tout le monde</b> https://exemple.fr")
+    b.press("#chat-texte", "Enter")
+    a.click("#chat-bascule")
+    a.wait_for_selector("#chat-liste p")
+    assert "<b>tout le monde</b>" in a.inner_text("#chat-liste")
+    assert a.locator("#chat-liste a, #chat-liste b").count() == 0     # ni lien ni HTML
+    s.click("#chat-bascule")
+    s.wait_for_selector("#chat-liste p")
+
+    # partie : les deux joueurs répondent, le spectateur voit l'image sans carte pour répondre
+    a.click("#lancer")
+    for p in (a, b):
+        p.wait_for_selector("#valider")
+    s.wait_for_selector("#pano")
+    assert s.locator("#mini").count() == 0
+    poser_repere(a, 0.5, 0.5); a.click("#valider")
+    b.wait_for_selector("#hud-reponses:has-text('1 / 2')")
+    poser_repere(b, 0.3, 0.3); b.click("#valider")
+    for p in (a, b, s):
+        p.wait_for_selector("#res-carte")
+        assert "C'était" in p.inner_text(".res-panneau") and "Hôte" in p.inner_text(".res-panneau") and "Ami" in p.inner_text(".res-panneau")
+    assert b.locator("#suivante").count() == 0
+    a.click("#suivante")
+    b.wait_for_selector("#valider")
+    # reconnexion : l'ami recharge la page et retrouve sa place dans la manche
+    b.reload()
+    b.fill('#entree input[name="pseudo"]', "Ami")
+    b.click("#entree button")
+    b.wait_for_selector("#hud-reponses")
+    for p in (a, b, s):
+        assert not p.erreurs, p.erreurs
+    for c in (ctx_a, ctx_b, ctx_s):
+        c.close()

@@ -56,3 +56,61 @@ class Client:
 
     def delete(self, chemin):
         return self.appeler("DELETE", chemin)
+
+
+class ClientWS:
+    """Ouvre un WebSocket sur l'application ASGI, dans la boucle d'événements courante."""
+
+    def __init__(self, app, chemin, entetes=None, cookies=None):
+        chemin_seul, _, requete = chemin.partition("?")
+        h = [(b"host", b"test")] + [(k.lower().encode(), v.encode()) for k, v in (entetes or {}).items()]
+        if cookies:
+            h.append((b"cookie", "; ".join(f"{k}={v}" for k, v in cookies.items()).encode()))
+        self.scope = {"type": "websocket", "asgi": {"version": "3.0"}, "scheme": "ws", "path": chemin_seul,
+                      "raw_path": chemin_seul.encode(), "query_string": requete.encode(), "headers": h,
+                      "server": ("test", 80), "client": ("127.0.0.1", 1), "subprotocols": []}
+        self.app, self.entrant, self.sortant = app, None, None
+        self.accepte, self.code_fermeture, self.tache = False, None, None
+
+    async def __aenter__(self):
+        import asyncio
+        self.entrant, self.sortant = asyncio.Queue(), asyncio.Queue()
+        await self.entrant.put({"type": "websocket.connect"})
+
+        async def send(m):
+            await self.sortant.put(m)
+        self.tache = asyncio.ensure_future(self.app(self.scope, self.entrant.get, send))
+        if getattr(self, "entree", None):
+            await self.envoyer(self.entree)
+        return self
+
+    async def __aexit__(self, *a):
+        import asyncio
+        await self.entrant.put({"type": "websocket.disconnect", "code": 1000})
+        try:
+            await asyncio.wait_for(self.tache, 2)
+        except Exception:
+            self.tache.cancel()
+
+    async def recevoir(self, delai=2):
+        """Prochain message JSON du serveur, ou None si le serveur a fermé."""
+        import asyncio
+        while True:
+            m = await asyncio.wait_for(self.sortant.get(), delai)
+            if m["type"] == "websocket.accept":
+                self.accepte = True
+            elif m["type"] == "websocket.close":
+                self.code_fermeture = m.get("code", 1000)
+                return None
+            elif m["type"] == "websocket.send":
+                return json.loads(m["text"]) if m.get("text") else m.get("bytes")
+
+    async def envoyer(self, message):
+        await self.entrant.put({"type": "websocket.receive", "text": json.dumps(message)})
+
+    async def jusqu_a(self, type_, delai=2):
+        """Lit les messages jusqu'à en trouver un du type demandé (le plus récent d'une rafale d'états)."""
+        while True:
+            m = await self.recevoir(delai)
+            if m is None or m.get("t") == type_:
+                return m

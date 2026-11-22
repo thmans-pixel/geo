@@ -10,7 +10,7 @@ import secrets
 import unicodedata
 
 from .. import base, config, horloge
-from . import cartes, fiches, geo, lieux as lieux_mod, score
+from . import cartes, fiches, geo, lieux as lieux_mod, profil, progression, score
 
 NB_MANCHES = 5
 MODES = ("classique", "defi", "defi_jour", "serie", "exploration")
@@ -36,7 +36,7 @@ def nettoyer_pseudo(pseudo) -> str:
 
 def _carte(carte_id) -> dict:
     c = cartes.carte(carte_id) if isinstance(carte_id, str) else None
-    if c is None:
+    if c is None or c.get("archivee"):
         raise ErreurJeu(400, "Carte inconnue.")
     return c
 
@@ -113,8 +113,9 @@ def infos_defi(joueur_id, defi_id) -> dict:
     with base.connexion() as c:
         row = _charger_defi(c, defi_id)
         classement = [{"pseudo": r["pseudo"], "total": r["total"]} for r in c.execute(
-            "SELECT pseudo, total FROM parties WHERE defi_id=? AND statut='terminee' "
-            "ORDER BY total DESC, cree_le ASC LIMIT 20", (row["id"],))]
+            "SELECT COALESCE(k.pseudo, p.pseudo) pseudo, p.total total FROM parties p "
+            "LEFT JOIN comptes k ON k.identifiant = p.compte WHERE p.defi_id=? AND p.statut='terminee' "
+            "ORDER BY p.total DESC, p.cree_le ASC LIMIT 20", (row["id"],))]
         deja = c.execute("SELECT id, statut FROM parties WHERE defi_id=? AND joueur_id=?",
                          (row["id"], joueur_id)).fetchone()
         infos = _lieux_public_defi(row)
@@ -126,18 +127,19 @@ def infos_defi(joueur_id, defi_id) -> dict:
 
 # ---------------------------------------------------------------- parties
 
-def creer_partie(joueur_id, mode, carte_id=None, contrainte="libre", chrono=0, pseudo="", defi_id=None) -> str:
+def creer_partie(joueur_id, mode, carte_id=None, contrainte="libre", chrono=0, pseudo="", defi_id=None, compte=None) -> str:
     if not isinstance(mode, str) or mode not in MODES:
         raise ErreurJeu(400, "Mode de jeu inconnu.")
     if defi_id is not None and not isinstance(defi_id, str):
         raise ErreurJeu(400, "Défi inconnu.")
-    pseudo = nettoyer_pseudo(pseudo)
+    pseudo = compte["pseudo"] if compte else nettoyer_pseudo(pseudo)
+    ident = compte["identifiant"] if compte else None
     with base.connexion() as c:
         nb = None
         if mode in ("defi", "defi_jour"):
             defi = _defi_jour(c) if mode == "defi_jour" else _charger_defi(c, defi_id)
-            deja = c.execute("SELECT id FROM parties WHERE defi_id=? AND joueur_id=?",
-                             (defi["id"], joueur_id)).fetchone()
+            deja = c.execute("SELECT id FROM parties WHERE defi_id=? AND (joueur_id=? OR (compte IS NOT NULL AND compte=?))",
+                             (defi["id"], joueur_id, ident)).fetchone()
             if deja:
                 raise ErreurJeu(409, "Tu as déjà joué ce défi.", partie_id=deja["id"])
             carte_id, contrainte, chrono = defi["carte"], defi["contrainte"], defi["chrono"]
@@ -153,14 +155,14 @@ def creer_partie(joueur_id, mode, carte_id=None, contrainte="libre", chrono=0, p
                 if mode == "serie":
                     _pays()
                 liste = [_lieux(lieux_mod.tirer_un, carte_id, set(), random.SystemRandom())]
-        ident = secrets.token_urlsafe(9)
+        ident_partie = secrets.token_urlsafe(9)
         now = horloge.maintenant()
         c.execute("INSERT INTO parties (id, joueur_id, pseudo, mode, carte, contrainte, chrono, defi_id, "
-                  "lieux_json, nb_manches, cree_le) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
-                  (ident, joueur_id, pseudo, mode, carte_id, contrainte, chrono, defi_ref, _json(liste), nb, now))
+                  "lieux_json, nb_manches, cree_le, compte) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+                  (ident_partie, joueur_id, pseudo, mode, carte_id, contrainte, chrono, defi_ref, _json(liste), nb, now, ident))
         c.execute("INSERT INTO manches (partie_id, numero, lieu_json, debut_le) VALUES (?,?,?,?)",
-                  (ident, 1, _json(liste[0]), now))
-        return ident
+                  (ident_partie, 1, _json(liste[0]), now))
+        return ident_partie
 
 
 def _partie(c, partie_id, joueur_id):
@@ -174,8 +176,9 @@ def _manche(c, p):
     return c.execute("SELECT * FROM manches WHERE partie_id=? AND numero=?", (p["id"], p["manche"])).fetchone()
 
 
-def _enregistrer(c, p, m, lat, lon, temps_ecoule):
-    """Range la réponse d'une manche (ou l'absence de réponse) et fait avancer la partie."""
+def _enregistrer(c, p, m, lat, lon, temps_ecoule) -> list:
+    """Range la réponse d'une manche (ou l'absence de réponse) et fait avancer la partie.
+    Renvoie les succès obtenus si la partie vient de se terminer."""
     lieu = json.loads(m["lieu_json"])
     carte = cartes.carte(p["carte"])
     distance = geo.distance_m(lieu["lat"], lieu["lon"], lat, lon) if lat is not None else None
@@ -201,7 +204,8 @@ def _enregistrer(c, p, m, lat, lon, temps_ecoule):
         serie = p["total"] + points
         cle = f"serie:{p['carte']}"
         c.execute("INSERT INTO records VALUES (?,?,?) ON CONFLICT(joueur_id, cle) DO UPDATE SET "
-                  "valeur = MAX(valeur, excluded.valeur)", (p["joueur_id"], cle, serie))
+                  "valeur = MAX(valeur, excluded.valeur)", (profil.proprietaire_record(p["compte"], p["joueur_id"]), cle, serie))
+    return progression.fin_de_partie(c, p["id"]) if statut == "terminee" else []
 
 
 def _regler_si_expiree(c, p, m):
@@ -255,7 +259,7 @@ def etat(joueur_id, partie_id) -> dict:
             out["resultat"] = _resultat(p, m)
             if p["mode"] == "serie" and p["statut"] == "terminee":
                 rec = c.execute("SELECT valeur FROM records WHERE joueur_id=? AND cle=?",
-                                (joueur_id, f"serie:{p['carte']}")).fetchone()
+                                (profil.proprietaire_record(p["compte"], joueur_id), f"serie:{p['carte']}")).fetchone()
                 out["resultat"]["serie"] = p["total"]
                 out["resultat"]["record"] = rec["valeur"] if rec else p["total"]
         return out
@@ -289,10 +293,10 @@ def repondre(joueur_id, partie_id, lat=None, lon=None) -> dict:
             lat, lon = _coordonnees(lat, lon)
             pas_de_repere = False
         ecoule = bool(p["chrono"]) and horloge.maintenant() >= m["debut_le"] + p["chrono"] - 1.5
-        _enregistrer(c, p, m, None if pas_de_repere else lat, None if pas_de_repere else lon,
-                     ecoule and pas_de_repere)
+        nouveaux = _enregistrer(c, p, m, None if pas_de_repere else lat, None if pas_de_repere else lon,
+                                ecoule and pas_de_repere)
         p = _partie(c, partie_id, joueur_id)
-        return _resultat(p, _manche(c, p)) | {"total": p["total"], "statut": p["statut"]}
+        return _resultat(p, _manche(c, p)) | {"total": p["total"], "statut": p["statut"], "nouveaux_succes": nouveaux}
 
 
 def reveler(joueur_id, partie_id) -> dict:
@@ -306,7 +310,7 @@ def reveler(joueur_id, partie_id) -> dict:
             raise ErreurJeu(409, "Le lieu est déjà révélé.")
         c.execute("UPDATE manches SET repondu_le=? WHERE partie_id=? AND numero=?",
                   (horloge.maintenant(), p["id"], m["numero"]))
-        return _resultat(p, _manche(c, p))
+        return _resultat(p, _manche(c, p)) | {"nouveaux_succes": progression.lieu_revele(c, p["id"])}
 
 
 def suivante(joueur_id, partie_id) -> None:

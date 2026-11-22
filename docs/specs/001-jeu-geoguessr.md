@@ -96,13 +96,13 @@ Chacun se vérifie par un test automatique ou par une manipulation précise.
 16. [ ] « Se connecter » passe par l'identification YunoHost ; le jeu ne stocke **aucun mot de passe**, seulement
     l'identifiant YunoHost et un pseudo d'affichage modifiable. — *Vérification :* connexion avec un compte
     YunoHost de test + lecture du schéma de la base.
-17. [ ] La page profil montre : parties jouées, meilleur score par carte, distance moyenne, record de Série
+17. [x] La page profil montre : parties jouées, meilleur score par carte, distance moyenne, record de Série
     de pays, pays les mieux et les moins bien reconnus, historique des 20 dernières parties.
     — *Vérification :* manipulation après quelques parties.
-18. [ ] Des succès se débloquent (ex. « 5 000 points sur une manche », « Série de 10 », « 50 pays trouvés »)
+18. [x] Des succès se débloquent (ex. « 5 000 points sur une manche », « Série de 10 », « 50 pays trouvés »)
     et un niveau monte avec l'expérience. — *Vérification :* test automatique sur chaque succès.
-19. [ ] Classements entre comptes : par carte, défi du jour, record de série. — *Vérification :* manipulation.
-20. [ ] Dans l'éditeur, Thibault crée une carte en cliquant des lieux ou en traçant une zone ; le serveur ne
+19. [x] Classements entre comptes : par carte, défi du jour, record de série. — *Vérification :* manipulation.
+20. [x] Dans l'éditeur, Thibault crée une carte en cliquant des lieux ou en traçant une zone ; le serveur ne
     garde que les points où une image existe, et la carte devient jouable dans tous les modes.
     — *Vérification :* créer « La Drôme » avec une zone, jouer une partie dessus.
 
@@ -215,3 +215,21 @@ score de 127 points pour 5 483 km sur Monde, clic aux États-Unis reconnu avec l
 nginx sur `/api/parties` et `/api/defis` ; cookie `Secure` ; page « Données et vie privée » et purge des
 anciennes parties ; liste de pseudos refusés ou retrait d'une ligne du classement public (à décider) ;
 en-têtes de sécurité. Relecture `gardien-enfants` faite sur l'étape 1 ; à refaire sur les étapes 2 et 3.
+
+## Livraison — étape 2 (comptes, profil, éditeur)
+**Fait :** identité par en-tête du SSO YunoHost (aucune inscription, aucun mot de passe ni e-mail stocké), pseudo
+neutre « Joueur-NNNN » à la première connexion puis modifiable, profil (stats, 20 dernières parties, pays), 8 succès
+et niveaux, classements entre comptes (par carte, défi du jour, série), éditeur de cartes réservé à l'administrateur
+(points ou zone, vérification des images côté serveur, archivage), 56 tests verts. Relecture `gardien-enfants` faite :
+usurpation de l'en-tête (corrigée : seulement depuis 127.0.0.1 + secret optionnel), cookie `joueur_id` forgé (corrigé),
+pseudo par défaut sans l'identifiant (corrigé), pseudo des défis à jour (corrigé).
+
+**Cochés :** 17, 18, 19, 20 (testés avec l'image factice). **Non cochés :**
+- 15 : l'absence d'inscription est testée, mais le salon à code relève de l'étape 3.
+- 16 : à vérifier sur thnas avec un vrai compte YunoHost (en-tête `Remote-User` posé par SSOwat, et vide pour un visiteur).
+- 20 en vrai : créer « La Drôme » avec une zone et la clé Google serveur, jouer dessus.
+- Non fait : exclusion d'un compte par l'administrateur ; compteur d'usage des images (étape 4).
+
+**Avant la mise en ligne (étape 4), en plus de l'étape 1 :** exiger `X-Requete` sur tous les POST (jeu compris) ; liste de
+pseudos refusés ou pseudos uniques ; suppression de compte et purge des parties ; migration de base atomique.
+

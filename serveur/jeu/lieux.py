@@ -27,7 +27,14 @@ def charger(carte_id: str) -> list[dict]:
     if carte is None:
         raise PasDeLieux("Carte inconnue.")
     lieux = []
-    if config.fournisseur_images() == "google":
+    if carte.get("perso"):
+        from .. import base
+        with base.connexion() as c:
+            for r in c.execute("SELECT * FROM lieux_perso WHERE carte_id=?", (carte_id,)):
+                image = ({"type": "google", "pano_id": r["pano_id"]} if config.fournisseur_images() == "google"
+                         else {"type": "factice", "motif": zlib.crc32(r["pano_id"].encode()) % 360})
+                lieux.append({"id": r["pano_id"], "lat": r["lat"], "lon": r["lon"], "pays": r["pays"], "image": image})
+    elif config.fournisseur_images() == "google":
         chemin = config.dossier_reserves() / f"{carte_id}.json"
         if not chemin.is_file():
             raise PasDeLieux(f"La réserve de lieux de la carte « {carte['nom']} » n'existe pas encore "

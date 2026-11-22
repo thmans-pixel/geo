@@ -4,12 +4,13 @@ import json
 
 
 class Client:
-    def __init__(self, app):
-        self.app, self.cookies = app, {}
+    def __init__(self, app, entetes=None):
+        self.app, self.cookies, self.entetes = app, {}, dict(entetes or {})
 
     async def _appel(self, methode, chemin, corps):
         donnees = json.dumps(corps).encode() if corps is not None else b""
         entetes = [(b"host", b"test"), (b"content-type", b"application/json")]
+        entetes += [(k.lower().encode(), v.encode()) for k, v in self.entetes.items()]
         if self.cookies:
             entetes.append((b"cookie", "; ".join(f"{k}={v}" for k, v in self.cookies.items()).encode()))
         chemin_seul, _, requete = chemin.partition("?")
@@ -52,3 +53,6 @@ class Client:
 
     def post(self, chemin, corps=None):
         return self.appeler("POST", chemin, {} if corps is None else corps)
+
+    def delete(self, chemin):
+        return self.appeler("DELETE", chemin)

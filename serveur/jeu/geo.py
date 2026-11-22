@@ -38,6 +38,11 @@ def _dans_polygone(lat, lon, polygone) -> bool:
     return not any(_dans_anneau(lat, lon, trou) for trou in polygone[1:])
 
 
+def dans_zone(lat, lon, zone) -> bool:
+    """Point dans un polygone simple décrit par une liste de [lat, lon]."""
+    return _dans_anneau(lat, lon, [[p[1], p[0]] for p in zone])
+
+
 def _code(proprietes) -> str | None:
     for cle in ("ISO_A2_EH", "ISO_A2", "iso_a2", "WB_A2"):
         v = proprietes.get(cle)

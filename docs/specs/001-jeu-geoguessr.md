@@ -2,7 +2,7 @@
 numero: 001
 titre: Jeu de géolocalisation façon GeoGuessr (solo, défis, multijoueur)
 depot: autre (nouveau dépôt, nom proposé thmans-pixel/geo)
-statut: livrée
+statut: en cours
 date: 2026-11-22
 ---
 

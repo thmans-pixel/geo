@@ -1,0 +1,710 @@
+{
+ "FR": {
+  "nom": "France",
+  "capitale": "Paris",
+  "langues": [
+   "français"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Plaques blanches au format AB-123-CD, avec une bande bleue à gauche.",
+   "Panneaux de direction bleus sur autoroute et verts sur route nationale."
+  ]
+ },
+ "GB": {
+  "nom": "Royaume-Uni",
+  "capitale": "Londres",
+  "langues": [
+   "anglais"
+  ],
+  "circulation": "gauche",
+  "indices": [
+   "On roule à gauche.",
+   "Lignes jaunes le long des trottoirs pour réglementer le stationnement."
+  ]
+ },
+ "IE": {
+  "nom": "Irlande",
+  "capitale": "Dublin",
+  "langues": [
+   "anglais",
+   "irlandais"
+  ],
+  "circulation": "gauche",
+  "indices": [
+   "On roule à gauche.",
+   "Panneaux bilingues anglais–irlandais, vitesses en km/h (contrairement au Royaume-Uni voisin)."
+  ]
+ },
+ "ES": {
+  "nom": "Espagne",
+  "capitale": "Madrid",
+  "langues": [
+   "espagnol"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Plaques blanches au format 1234 ABC, avec une bande bleue à gauche.",
+   "Certaines régions ajoutent le catalan, le basque ou le galicien sur les panneaux."
+  ]
+ },
+ "PT": {
+  "nom": "Portugal",
+  "capitale": "Lisbonne",
+  "langues": [
+   "portugais"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Trottoirs pavés de petits cubes de pierre blanche et noire.",
+   "Langue portugaise sur les panneaux."
+  ]
+ },
+ "IT": {
+  "nom": "Italie",
+  "capitale": "Rome",
+  "langues": [
+   "italien"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Panneaux d'autoroute à fond vert, de route nationale à fond bleu.",
+   "Langue italienne sur les panneaux."
+  ]
+ },
+ "CH": {
+  "nom": "Suisse",
+  "capitale": "Berne",
+  "langues": [
+   "allemand",
+   "français",
+   "italien",
+   "romanche"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Autoroutes signalées sur fond vert.",
+   "La langue des panneaux change selon le canton."
+  ]
+ },
+ "DE": {
+  "nom": "Allemagne",
+  "capitale": "Berlin",
+  "langues": [
+   "allemand"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Panneaux d'autoroute à fond bleu ; pas de limitation de vitesse sur de nombreux tronçons.",
+   "Plaques blanches avec l'abréviation de la ville au début."
+  ]
+ },
+ "AT": {
+  "nom": "Autriche",
+  "capitale": "Vienne",
+  "langues": [
+   "allemand"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Panneaux d'autoroute à fond bleu.",
+   "Langue allemande sur les panneaux."
+  ]
+ },
+ "CZ": {
+  "nom": "Tchéquie",
+  "capitale": "Prague",
+  "langues": [
+   "tchèque"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Lettres avec des accents en forme de « v » (č, ř, š, ž).",
+   "Plaques blanches avec une bande bleue."
+  ]
+ },
+ "HU": {
+  "nom": "Hongrie",
+  "capitale": "Budapest",
+  "langues": [
+   "hongrois"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Noms de lieux longs, avec des lettres comme ő et ű.",
+   "Langue hongroise sans parenté avec ses voisins."
+  ]
+ },
+ "PL": {
+  "nom": "Pologne",
+  "capitale": "Varsovie",
+  "langues": [
+   "polonais"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Lettres particulières comme ł, ś, ż.",
+   "Plaques blanches avec une bande bleue."
+  ]
+ },
+ "NL": {
+  "nom": "Pays-Bas",
+  "capitale": "Amsterdam",
+  "langues": [
+   "néerlandais"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Pistes cyclables rouges très répandues.",
+   "Paysage très plat de polders et de canaux."
+  ]
+ },
+ "BE": {
+  "nom": "Belgique",
+  "capitale": "Bruxelles",
+  "langues": [
+   "néerlandais",
+   "français",
+   "allemand"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Langue des panneaux selon la région : néerlandais en Flandre, français en Wallonie.",
+   "Panneaux bilingues à Bruxelles."
+  ]
+ },
+ "DK": {
+  "nom": "Danemark",
+  "capitale": "Copenhague",
+  "langues": [
+   "danois"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Lettres æ, ø et å.",
+   "Pistes cyclables nombreuses, relief très plat."
+  ]
+ },
+ "SE": {
+  "nom": "Suède",
+  "capitale": "Stockholm",
+  "langues": [
+   "suédois"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Lettres å, ä et ö.",
+   "Maisons en bois peintes en rouge sombre."
+  ]
+ },
+ "NO": {
+  "nom": "Norvège",
+  "capitale": "Oslo",
+  "langues": [
+   "norvégien"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Lettres æ, ø et å.",
+   "Fjords et montagnes, tunnels très nombreux."
+  ]
+ },
+ "FI": {
+  "nom": "Finlande",
+  "capitale": "Helsinki",
+  "langues": [
+   "finnois",
+   "suédois"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Panneaux souvent bilingues finnois–suédois sur la côte.",
+   "Forêts et lacs à perte de vue."
+  ]
+ },
+ "IS": {
+  "nom": "Islande",
+  "capitale": "Reykjavik",
+  "langues": [
+   "islandais"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Lettres þ et ð.",
+   "Paysages volcaniques presque sans arbres."
+  ]
+ },
+ "GR": {
+  "nom": "Grèce",
+  "capitale": "Athènes",
+  "langues": [
+   "grec"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Alphabet grec, avec une transcription en lettres latines sur les panneaux routiers.",
+   "Chapelles blanches au bord des routes."
+  ]
+ },
+ "TR": {
+  "nom": "Turquie",
+  "capitale": "Ankara",
+  "langues": [
+   "turc"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Lettres ç, ğ, ı et ş.",
+   "Mosquées à minarets dans presque chaque village."
+  ]
+ },
+ "RO": {
+  "nom": "Roumanie",
+  "capitale": "Bucarest",
+  "langues": [
+   "roumain"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Lettres ă, â, î, ș et ț.",
+   "Langue latine, proche du français et de l'italien."
+  ]
+ },
+ "HR": {
+  "nom": "Croatie",
+  "capitale": "Zagreb",
+  "langues": [
+   "croate"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Lettres č, ć, đ, š et ž.",
+   "Côte adriatique bordée d'îles."
+  ]
+ },
+ "BG": {
+  "nom": "Bulgarie",
+  "capitale": "Sofia",
+  "langues": [
+   "bulgare"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Alphabet cyrillique, avec une transcription latine sur les panneaux routiers.",
+   "Plaques blanches avec une bande bleue."
+  ]
+ },
+ "EE": {
+  "nom": "Estonie",
+  "capitale": "Tallinn",
+  "langues": [
+   "estonien"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Lettres õ, ä, ö et ü.",
+   "Langue proche du finnois."
+  ]
+ },
+ "LV": {
+  "nom": "Lettonie",
+  "capitale": "Riga",
+  "langues": [
+   "letton"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Lettres avec barre (ā, ē, ī, ū) ou cédille (ķ, ļ, ņ).",
+   "Plaques blanches avec une bande bleue."
+  ]
+ },
+ "LT": {
+  "nom": "Lituanie",
+  "capitale": "Vilnius",
+  "langues": [
+   "lituanien"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Lettres ą, ę, į, ų et ė.",
+   "Plaques blanches avec une bande bleue."
+  ]
+ },
+ "LU": {
+  "nom": "Luxembourg",
+  "capitale": "Luxembourg",
+  "langues": [
+   "luxembourgeois",
+   "français",
+   "allemand"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Trois langues officielles, souvent mêlées sur les panneaux.",
+   "Petit pays aux plaques blanches avec bande bleue."
+  ]
+ },
+ "SI": {
+  "nom": "Slovénie",
+  "capitale": "Ljubljana",
+  "langues": [
+   "slovène"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Lettres č, š et ž.",
+   "Montagnes alpines et prairies vertes."
+  ]
+ },
+ "SK": {
+  "nom": "Slovaquie",
+  "capitale": "Bratislava",
+  "langues": [
+   "slovaque"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Lettres comme ô, ľ et ŕ.",
+   "Plaques blanches avec une bande bleue."
+  ]
+ },
+ "US": {
+  "nom": "États-Unis",
+  "capitale": "Washington D.C.",
+  "langues": [
+   "anglais"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Poteaux électriques en bois avec des fils aériens.",
+   "Ligne jaune au centre de la route et panneaux d'avertissement jaunes."
+  ]
+ },
+ "CA": {
+  "nom": "Canada",
+  "capitale": "Ottawa",
+  "langues": [
+   "anglais",
+   "français"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Panneaux bilingues dans plusieurs provinces, en français seulement au Québec.",
+   "Vitesses en km/h."
+  ]
+ },
+ "MX": {
+  "nom": "Mexique",
+  "capitale": "Mexico",
+  "langues": [
+   "espagnol"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Ralentisseurs (« topes ») très fréquents.",
+   "Langue espagnole sur les panneaux."
+  ]
+ },
+ "BR": {
+  "nom": "Brésil",
+  "capitale": "Brasilia",
+  "langues": [
+   "portugais"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Langue portugaise.",
+   "Plaques au format ABC1D23 (norme Mercosur)."
+  ]
+ },
+ "AR": {
+  "nom": "Argentine",
+  "capitale": "Buenos Aires",
+  "langues": [
+   "espagnol"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Plaques au format AB 123 CD (norme Mercosur).",
+   "Langue espagnole."
+  ]
+ },
+ "CL": {
+  "nom": "Chili",
+  "capitale": "Santiago",
+  "langues": [
+   "espagnol"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Pays très long et étroit entre les Andes et le Pacifique.",
+   "Langue espagnole."
+  ]
+ },
+ "PE": {
+  "nom": "Pérou",
+  "capitale": "Lima",
+  "langues": [
+   "espagnol",
+   "quechua",
+   "aymara"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Langue espagnole, avec le quechua dans les Andes.",
+   "Nombreux mototaxis dans les villes."
+  ]
+ },
+ "CO": {
+  "nom": "Colombie",
+  "capitale": "Bogota",
+  "langues": [
+   "espagnol"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Plaques jaunes pour les voitures particulières.",
+   "Langue espagnole."
+  ]
+ },
+ "MA": {
+  "nom": "Maroc",
+  "capitale": "Rabat",
+  "langues": [
+   "arabe",
+   "amazigh"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Panneaux en arabe et en français.",
+   "Maisons et murs ocre ou blancs."
+  ]
+ },
+ "ZA": {
+  "nom": "Afrique du Sud",
+  "capitale": "Pretoria",
+  "langues": [
+   "anglais",
+   "zoulou",
+   "afrikaans"
+  ],
+  "circulation": "gauche",
+  "indices": [
+   "On roule à gauche.",
+   "Lignes de rive jaunes sur le bord des routes."
+  ]
+ },
+ "KE": {
+  "nom": "Kenya",
+  "capitale": "Nairobi",
+  "langues": [
+   "swahili",
+   "anglais"
+  ],
+  "circulation": "gauche",
+  "indices": [
+   "On roule à gauche.",
+   "Minibus colorés (matatus) très présents."
+  ]
+ },
+ "SN": {
+  "nom": "Sénégal",
+  "capitale": "Dakar",
+  "langues": [
+   "français",
+   "wolof"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Langue française sur les panneaux.",
+   "Taxis jaunes et noirs à Dakar."
+  ]
+ },
+ "NG": {
+  "nom": "Nigéria",
+  "capitale": "Abuja",
+  "langues": [
+   "anglais"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Nombreux moto-taxis (okadas).",
+   "Langue anglaise sur les panneaux."
+  ]
+ },
+ "TN": {
+  "nom": "Tunisie",
+  "capitale": "Tunis",
+  "langues": [
+   "arabe"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Panneaux en arabe et en français.",
+   "Maisons blanches aux portes bleues, par exemple à Sidi Bou Saïd."
+  ]
+ },
+ "IN": {
+  "nom": "Inde",
+  "capitale": "New Delhi",
+  "langues": [
+   "hindi",
+   "anglais"
+  ],
+  "circulation": "gauche",
+  "indices": [
+   "On roule à gauche.",
+   "Rickshaws motorisés et scooters partout, vaches sur la route."
+  ]
+ },
+ "JP": {
+  "nom": "Japon",
+  "capitale": "Tokyo",
+  "langues": [
+   "japonais"
+  ],
+  "circulation": "gauche",
+  "indices": [
+   "On roule à gauche.",
+   "Poteaux électriques en béton et fils aériens partout.",
+   "Panneau stop en triangle rouge pointe en bas."
+  ]
+ },
+ "KR": {
+  "nom": "Corée du Sud",
+  "capitale": "Séoul",
+  "langues": [
+   "coréen"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Alphabet coréen (hangeul).",
+   "Enseignes très nombreuses et lumineuses."
+  ]
+ },
+ "TH": {
+  "nom": "Thaïlande",
+  "capitale": "Bangkok",
+  "langues": [
+   "thaï"
+  ],
+  "circulation": "gauche",
+  "indices": [
+   "On roule à gauche.",
+   "Alphabet thaï, tuk-tuks dans les villes."
+  ]
+ },
+ "ID": {
+  "nom": "Indonésie",
+  "capitale": "Jakarta",
+  "langues": [
+   "indonésien"
+  ],
+  "circulation": "gauche",
+  "indices": [
+   "On roule à gauche.",
+   "Foule de scooters sur les routes."
+  ]
+ },
+ "SG": {
+  "nom": "Singapour",
+  "capitale": "Singapour",
+  "langues": [
+   "anglais",
+   "malais",
+   "mandarin",
+   "tamoul"
+  ],
+  "circulation": "gauche",
+  "indices": [
+   "On roule à gauche.",
+   "Ville très propre et très verte, panneaux en anglais."
+  ]
+ },
+ "MY": {
+  "nom": "Malaisie",
+  "capitale": "Kuala Lumpur",
+  "langues": [
+   "malais"
+  ],
+  "circulation": "gauche",
+  "indices": [
+   "On roule à gauche.",
+   "Langue malaise, avec l'anglais sur de nombreux panneaux."
+  ]
+ },
+ "PH": {
+  "nom": "Philippines",
+  "capitale": "Manille",
+  "langues": [
+   "filipino",
+   "anglais"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Jeepneys colorés, anciens véhicules militaires transformés en transports.",
+   "Panneaux en anglais."
+  ]
+ },
+ "AU": {
+  "nom": "Australie",
+  "capitale": "Canberra",
+  "langues": [
+   "anglais"
+  ],
+  "circulation": "gauche",
+  "indices": [
+   "On roule à gauche.",
+   "Panneaux d'avertissement jaunes avec kangourou ou wombat."
+  ]
+ },
+ "NZ": {
+  "nom": "Nouvelle-Zélande",
+  "capitale": "Wellington",
+  "langues": [
+   "anglais",
+   "maori"
+  ],
+  "circulation": "gauche",
+  "indices": [
+   "On roule à gauche.",
+   "Panneaux d'avertissement jaunes, collines vertes couvertes de moutons."
+  ]
+ },
+ "AE": {
+  "nom": "Émirats arabes unis",
+  "capitale": "Abou Dabi",
+  "langues": [
+   "arabe"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Panneaux bilingues arabe–anglais.",
+   "Désert et gratte-ciel."
+  ]
+ },
+ "MN": {
+  "nom": "Mongolie",
+  "capitale": "Oulan-Bator",
+  "langues": [
+   "mongol"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Alphabet cyrillique mongol.",
+   "Steppe immense et yourtes (gers)."
+  ]
+ },
+ "RU": {
+  "nom": "Russie",
+  "capitale": "Moscou",
+  "langues": [
+   "russe"
+  ],
+  "circulation": "droite",
+  "indices": [
+   "Alphabet cyrillique.",
+   "Pays immense à onze fuseaux horaires."
+  ]
+ }
+}

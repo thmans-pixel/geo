@@ -1,0 +1,849 @@
+[
+ {
+  "nom": "Valence",
+  "lat": 44.9334,
+  "lon": 4.8924,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Romans-sur-Isère",
+  "lat": 45.0453,
+  "lon": 5.0539,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Bourg-de-Péage",
+  "lat": 45.0388,
+  "lon": 5.0517,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Montélimar",
+  "lat": 44.558,
+  "lon": 4.75,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Privas",
+  "lat": 44.735,
+  "lon": 4.599,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Aubenas",
+  "lat": 44.62,
+  "lon": 4.39,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Tournon-sur-Rhône",
+  "lat": 45.067,
+  "lon": 4.833,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Die",
+  "lat": 44.754,
+  "lon": 5.372,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Nyons",
+  "lat": 44.36,
+  "lon": 5.141,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Crest",
+  "lat": 44.728,
+  "lon": 5.026,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Annonay",
+  "lat": 45.239,
+  "lon": 4.67,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Saint-Péray",
+  "lat": 44.935,
+  "lon": 4.847,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Vallon-Pont-d'Arc",
+  "lat": 44.405,
+  "lon": 4.395,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Grenoble",
+  "lat": 45.1885,
+  "lon": 5.7245,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Lyon",
+  "lat": 45.764,
+  "lon": 4.8357,
+  "pays": "FR",
+  "celebre": true
+ },
+ {
+  "nom": "Saint-Étienne",
+  "lat": 45.4397,
+  "lon": 4.3872,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Clermont-Ferrand",
+  "lat": 45.7772,
+  "lon": 3.087,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Annecy",
+  "lat": 45.8992,
+  "lon": 6.1294,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Chambéry",
+  "lat": 45.5646,
+  "lon": 5.9178,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Chamonix",
+  "lat": 45.9237,
+  "lon": 6.8694,
+  "pays": "FR",
+  "celebre": true
+ },
+ {
+  "nom": "Le Puy-en-Velay",
+  "lat": 45.043,
+  "lon": 3.885,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Vichy",
+  "lat": 46.1272,
+  "lon": 3.426,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Paris",
+  "lat": 48.8566,
+  "lon": 2.3522,
+  "pays": "FR",
+  "celebre": true
+ },
+ {
+  "nom": "Marseille",
+  "lat": 43.2965,
+  "lon": 5.3698,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Nice",
+  "lat": 43.7102,
+  "lon": 7.262,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Bordeaux",
+  "lat": 44.8378,
+  "lon": -0.5792,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Toulouse",
+  "lat": 43.6047,
+  "lon": 1.4442,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Nantes",
+  "lat": 47.2184,
+  "lon": -1.5536,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Strasbourg",
+  "lat": 48.5734,
+  "lon": 7.7521,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Lille",
+  "lat": 50.6292,
+  "lon": 3.0573,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Rennes",
+  "lat": 48.1173,
+  "lon": -1.6778,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Mont-Saint-Michel",
+  "lat": 48.6361,
+  "lon": -1.5115,
+  "pays": "FR",
+  "celebre": true
+ },
+ {
+  "nom": "Carcassonne",
+  "lat": 43.213,
+  "lon": 2.3491,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Biarritz",
+  "lat": 43.4832,
+  "lon": -1.5586,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Ajaccio",
+  "lat": 41.9192,
+  "lon": 8.7386,
+  "pays": "FR",
+  "celebre": false
+ },
+ {
+  "nom": "Londres",
+  "lat": 51.5074,
+  "lon": -0.1278,
+  "pays": "GB",
+  "celebre": true
+ },
+ {
+  "nom": "Édimbourg",
+  "lat": 55.9533,
+  "lon": -3.1883,
+  "pays": "GB",
+  "celebre": false
+ },
+ {
+  "nom": "Dublin",
+  "lat": 53.3498,
+  "lon": -6.2603,
+  "pays": "IE",
+  "celebre": false
+ },
+ {
+  "nom": "Madrid",
+  "lat": 40.4168,
+  "lon": -3.7038,
+  "pays": "ES",
+  "celebre": false
+ },
+ {
+  "nom": "Barcelone",
+  "lat": 41.3874,
+  "lon": 2.1686,
+  "pays": "ES",
+  "celebre": true
+ },
+ {
+  "nom": "Séville",
+  "lat": 37.3891,
+  "lon": -5.9845,
+  "pays": "ES",
+  "celebre": false
+ },
+ {
+  "nom": "Lisbonne",
+  "lat": 38.7223,
+  "lon": -9.1393,
+  "pays": "PT",
+  "celebre": false
+ },
+ {
+  "nom": "Porto",
+  "lat": 41.1579,
+  "lon": -8.6291,
+  "pays": "PT",
+  "celebre": false
+ },
+ {
+  "nom": "Rome",
+  "lat": 41.9028,
+  "lon": 12.4964,
+  "pays": "IT",
+  "celebre": true
+ },
+ {
+  "nom": "Milan",
+  "lat": 45.4642,
+  "lon": 9.19,
+  "pays": "IT",
+  "celebre": false
+ },
+ {
+  "nom": "Venise",
+  "lat": 45.4408,
+  "lon": 12.3155,
+  "pays": "IT",
+  "celebre": true
+ },
+ {
+  "nom": "Florence",
+  "lat": 43.7696,
+  "lon": 11.2558,
+  "pays": "IT",
+  "celebre": false
+ },
+ {
+  "nom": "Naples",
+  "lat": 40.8518,
+  "lon": 14.2681,
+  "pays": "IT",
+  "celebre": false
+ },
+ {
+  "nom": "Berne",
+  "lat": 46.948,
+  "lon": 7.4474,
+  "pays": "CH",
+  "celebre": false
+ },
+ {
+  "nom": "Genève",
+  "lat": 46.2044,
+  "lon": 6.1432,
+  "pays": "CH",
+  "celebre": false
+ },
+ {
+  "nom": "Zurich",
+  "lat": 47.3769,
+  "lon": 8.5417,
+  "pays": "CH",
+  "celebre": false
+ },
+ {
+  "nom": "Berlin",
+  "lat": 52.52,
+  "lon": 13.405,
+  "pays": "DE",
+  "celebre": true
+ },
+ {
+  "nom": "Munich",
+  "lat": 48.1351,
+  "lon": 11.582,
+  "pays": "DE",
+  "celebre": false
+ },
+ {
+  "nom": "Hambourg",
+  "lat": 53.5511,
+  "lon": 9.9937,
+  "pays": "DE",
+  "celebre": false
+ },
+ {
+  "nom": "Vienne",
+  "lat": 48.2082,
+  "lon": 16.3738,
+  "pays": "AT",
+  "celebre": false
+ },
+ {
+  "nom": "Prague",
+  "lat": 50.0755,
+  "lon": 14.4378,
+  "pays": "CZ",
+  "celebre": true
+ },
+ {
+  "nom": "Budapest",
+  "lat": 47.4979,
+  "lon": 19.0402,
+  "pays": "HU",
+  "celebre": false
+ },
+ {
+  "nom": "Varsovie",
+  "lat": 52.2297,
+  "lon": 21.0122,
+  "pays": "PL",
+  "celebre": false
+ },
+ {
+  "nom": "Cracovie",
+  "lat": 50.0647,
+  "lon": 19.945,
+  "pays": "PL",
+  "celebre": false
+ },
+ {
+  "nom": "Amsterdam",
+  "lat": 52.3676,
+  "lon": 4.9041,
+  "pays": "NL",
+  "celebre": false
+ },
+ {
+  "nom": "Bruxelles",
+  "lat": 50.8503,
+  "lon": 4.3517,
+  "pays": "BE",
+  "celebre": false
+ },
+ {
+  "nom": "Copenhague",
+  "lat": 55.6761,
+  "lon": 12.5683,
+  "pays": "DK",
+  "celebre": false
+ },
+ {
+  "nom": "Stockholm",
+  "lat": 59.3293,
+  "lon": 18.0686,
+  "pays": "SE",
+  "celebre": false
+ },
+ {
+  "nom": "Oslo",
+  "lat": 59.9139,
+  "lon": 10.7522,
+  "pays": "NO",
+  "celebre": false
+ },
+ {
+  "nom": "Helsinki",
+  "lat": 60.1699,
+  "lon": 24.9384,
+  "pays": "FI",
+  "celebre": false
+ },
+ {
+  "nom": "Reykjavik",
+  "lat": 64.1466,
+  "lon": -21.9426,
+  "pays": "IS",
+  "celebre": false
+ },
+ {
+  "nom": "Athènes",
+  "lat": 37.9838,
+  "lon": 23.7275,
+  "pays": "GR",
+  "celebre": true
+ },
+ {
+  "nom": "Istanbul",
+  "lat": 41.0082,
+  "lon": 28.9784,
+  "pays": "TR",
+  "celebre": true
+ },
+ {
+  "nom": "Bucarest",
+  "lat": 44.4268,
+  "lon": 26.1025,
+  "pays": "RO",
+  "celebre": false
+ },
+ {
+  "nom": "Zagreb",
+  "lat": 45.815,
+  "lon": 15.9819,
+  "pays": "HR",
+  "celebre": false
+ },
+ {
+  "nom": "Sofia",
+  "lat": 42.6977,
+  "lon": 23.3219,
+  "pays": "BG",
+  "celebre": false
+ },
+ {
+  "nom": "Tallinn",
+  "lat": 59.437,
+  "lon": 24.7536,
+  "pays": "EE",
+  "celebre": false
+ },
+ {
+  "nom": "Riga",
+  "lat": 56.9496,
+  "lon": 24.1052,
+  "pays": "LV",
+  "celebre": false
+ },
+ {
+  "nom": "Vilnius",
+  "lat": 54.6872,
+  "lon": 25.2797,
+  "pays": "LT",
+  "celebre": false
+ },
+ {
+  "nom": "Luxembourg",
+  "lat": 49.6116,
+  "lon": 6.1319,
+  "pays": "LU",
+  "celebre": false
+ },
+ {
+  "nom": "Ljubljana",
+  "lat": 46.0569,
+  "lon": 14.5058,
+  "pays": "SI",
+  "celebre": false
+ },
+ {
+  "nom": "Bratislava",
+  "lat": 48.1486,
+  "lon": 17.1077,
+  "pays": "SK",
+  "celebre": false
+ },
+ {
+  "nom": "New York",
+  "lat": 40.7128,
+  "lon": -74.006,
+  "pays": "US",
+  "celebre": true
+ },
+ {
+  "nom": "San Francisco",
+  "lat": 37.7749,
+  "lon": -122.4194,
+  "pays": "US",
+  "celebre": true
+ },
+ {
+  "nom": "Los Angeles",
+  "lat": 34.0522,
+  "lon": -118.2437,
+  "pays": "US",
+  "celebre": false
+ },
+ {
+  "nom": "Chicago",
+  "lat": 41.8781,
+  "lon": -87.6298,
+  "pays": "US",
+  "celebre": false
+ },
+ {
+  "nom": "Washington",
+  "lat": 38.9072,
+  "lon": -77.0369,
+  "pays": "US",
+  "celebre": false
+ },
+ {
+  "nom": "Las Vegas",
+  "lat": 36.1699,
+  "lon": -115.1398,
+  "pays": "US",
+  "celebre": false
+ },
+ {
+  "nom": "Miami",
+  "lat": 25.7617,
+  "lon": -80.1918,
+  "pays": "US",
+  "celebre": false
+ },
+ {
+  "nom": "Seattle",
+  "lat": 47.6062,
+  "lon": -122.3321,
+  "pays": "US",
+  "celebre": false
+ },
+ {
+  "nom": "Toronto",
+  "lat": 43.6532,
+  "lon": -79.3832,
+  "pays": "CA",
+  "celebre": false
+ },
+ {
+  "nom": "Montréal",
+  "lat": 45.5017,
+  "lon": -73.5673,
+  "pays": "CA",
+  "celebre": false
+ },
+ {
+  "nom": "Vancouver",
+  "lat": 49.2827,
+  "lon": -123.1207,
+  "pays": "CA",
+  "celebre": false
+ },
+ {
+  "nom": "Mexico",
+  "lat": 19.4326,
+  "lon": -99.1332,
+  "pays": "MX",
+  "celebre": false
+ },
+ {
+  "nom": "Rio de Janeiro",
+  "lat": -22.9068,
+  "lon": -43.1729,
+  "pays": "BR",
+  "celebre": true
+ },
+ {
+  "nom": "São Paulo",
+  "lat": -23.5505,
+  "lon": -46.6333,
+  "pays": "BR",
+  "celebre": false
+ },
+ {
+  "nom": "Buenos Aires",
+  "lat": -34.6037,
+  "lon": -58.3816,
+  "pays": "AR",
+  "celebre": false
+ },
+ {
+  "nom": "Santiago",
+  "lat": -33.4489,
+  "lon": -70.6693,
+  "pays": "CL",
+  "celebre": false
+ },
+ {
+  "nom": "Lima",
+  "lat": -12.0464,
+  "lon": -77.0428,
+  "pays": "PE",
+  "celebre": false
+ },
+ {
+  "nom": "Bogota",
+  "lat": 4.711,
+  "lon": -74.0721,
+  "pays": "CO",
+  "celebre": false
+ },
+ {
+  "nom": "Rabat",
+  "lat": 34.0209,
+  "lon": -6.8416,
+  "pays": "MA",
+  "celebre": false
+ },
+ {
+  "nom": "Le Cap",
+  "lat": -33.9249,
+  "lon": 18.4241,
+  "pays": "ZA",
+  "celebre": true
+ },
+ {
+  "nom": "Johannesburg",
+  "lat": -26.2041,
+  "lon": 28.0473,
+  "pays": "ZA",
+  "celebre": false
+ },
+ {
+  "nom": "Nairobi",
+  "lat": -1.2921,
+  "lon": 36.8219,
+  "pays": "KE",
+  "celebre": false
+ },
+ {
+  "nom": "Dakar",
+  "lat": 14.7167,
+  "lon": -17.4677,
+  "pays": "SN",
+  "celebre": false
+ },
+ {
+  "nom": "Lagos",
+  "lat": 6.5244,
+  "lon": 3.3792,
+  "pays": "NG",
+  "celebre": false
+ },
+ {
+  "nom": "Tunis",
+  "lat": 36.8065,
+  "lon": 10.1815,
+  "pays": "TN",
+  "celebre": false
+ },
+ {
+  "nom": "Delhi",
+  "lat": 28.6139,
+  "lon": 77.209,
+  "pays": "IN",
+  "celebre": false
+ },
+ {
+  "nom": "Bombay",
+  "lat": 19.076,
+  "lon": 72.8777,
+  "pays": "IN",
+  "celebre": false
+ },
+ {
+  "nom": "Tokyo",
+  "lat": 35.6762,
+  "lon": 139.6503,
+  "pays": "JP",
+  "celebre": true
+ },
+ {
+  "nom": "Kyoto",
+  "lat": 35.0116,
+  "lon": 135.7681,
+  "pays": "JP",
+  "celebre": false
+ },
+ {
+  "nom": "Osaka",
+  "lat": 34.6937,
+  "lon": 135.5023,
+  "pays": "JP",
+  "celebre": false
+ },
+ {
+  "nom": "Séoul",
+  "lat": 37.5665,
+  "lon": 126.978,
+  "pays": "KR",
+  "celebre": false
+ },
+ {
+  "nom": "Bangkok",
+  "lat": 13.7563,
+  "lon": 100.5018,
+  "pays": "TH",
+  "celebre": false
+ },
+ {
+  "nom": "Jakarta",
+  "lat": -6.2088,
+  "lon": 106.8456,
+  "pays": "ID",
+  "celebre": false
+ },
+ {
+  "nom": "Singapour",
+  "lat": 1.3521,
+  "lon": 103.8198,
+  "pays": "SG",
+  "celebre": true
+ },
+ {
+  "nom": "Kuala Lumpur",
+  "lat": 3.139,
+  "lon": 101.6869,
+  "pays": "MY",
+  "celebre": false
+ },
+ {
+  "nom": "Manille",
+  "lat": 14.5995,
+  "lon": 120.9842,
+  "pays": "PH",
+  "celebre": false
+ },
+ {
+  "nom": "Sydney",
+  "lat": -33.8688,
+  "lon": 151.2093,
+  "pays": "AU",
+  "celebre": true
+ },
+ {
+  "nom": "Melbourne",
+  "lat": -37.8136,
+  "lon": 144.9631,
+  "pays": "AU",
+  "celebre": false
+ },
+ {
+  "nom": "Auckland",
+  "lat": -36.8485,
+  "lon": 174.7633,
+  "pays": "NZ",
+  "celebre": false
+ },
+ {
+  "nom": "Wellington",
+  "lat": -41.2866,
+  "lon": 174.7756,
+  "pays": "NZ",
+  "celebre": false
+ },
+ {
+  "nom": "Dubaï",
+  "lat": 25.2048,
+  "lon": 55.2708,
+  "pays": "AE",
+  "celebre": true
+ },
+ {
+  "nom": "Oulan-Bator",
+  "lat": 47.8864,
+  "lon": 106.9057,
+  "pays": "MN",
+  "celebre": false
+ },
+ {
+  "nom": "Moscou",
+  "lat": 55.7558,
+  "lon": 37.6173,
+  "pays": "RU",
+  "celebre": false
+ },
+ {
+  "nom": "Saint-Pétersbourg",
+  "lat": 59.9311,
+  "lon": 30.3609,
+  "pays": "RU",
+  "celebre": false
+ }
+]

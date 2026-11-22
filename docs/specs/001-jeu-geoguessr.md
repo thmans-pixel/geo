@@ -2,7 +2,7 @@
 numero: 001
 titre: Jeu de géolocalisation façon GeoGuessr (solo, défis, multijoueur)
 depot: autre (nouveau dépôt, nom proposé thmans-pixel/geo)
-statut: validée
+statut: livrée
 date: 2026-11-22
 ---
 
@@ -62,29 +62,29 @@ Chacun se vérifie par un test automatique ou par une manipulation précise.
 1. [ ] Quand je lance une partie Classique sur « Monde », alors je vois une image de rue à 360° et une
    mini-carte où poser mon repère, et le bouton « Valider » ne s'active qu'une fois le repère posé.
    — *Vérification :* manipulation dans le navigateur.
-2. [ ] Quand je valide, alors l'écran de manche montre ma réponse, le vrai lieu, une ligne entre les deux,
+2. [x] Quand je valide, alors l'écran de manche montre ma réponse, le vrai lieu, une ligne entre les deux,
    la distance en km (ou m sous 1 km) et les points. — *Vérification :* manipulation.
-3. [ ] Le score suit `5000 × e^(−10 × d / D)` (d = distance, D = diagonale de la carte), arrondi, et vaut
+3. [x] Le score suit `5000 × e^(−10 × d / D)` (d = distance, D = diagonale de la carte), arrondi, et vaut
    5 000 sous 25 m ; il est calculé **par le serveur**, jamais par le navigateur.
    — *Vérification :* test automatique sur des distances connues (0 m, 25 m, D/10, D).
-4. [ ] Le navigateur ne reçoit les coordonnées du lieu qu'**après** la réponse du joueur.
+4. [x] Le navigateur ne reçoit les coordonnées du lieu qu'**après** la réponse du joueur.
    — *Vérification :* test automatique de l'API + lecture de l'onglet Réseau pendant une manche.
 5. [ ] En contrainte *Sans déplacement*, les flèches de déplacement sont absentes ; en *Figé*, rotation et
    zoom sont aussi bloqués. — *Vérification :* manipulation sur les trois contraintes.
-6. [ ] Quand le chrono arrive à zéro sans repère, la manche vaut 0 point ; avec un repère posé, il est
+6. [x] Quand le chrono arrive à zéro sans repère, la manche vaut 0 point ; avec un repère posé, il est
    validé automatiquement. — *Vérification :* test automatique + manipulation à 10 s.
-7. [ ] En fin de partie, un récapitulatif montre les 5 manches sur une carte et le total sur 25 000.
+7. [x] En fin de partie, un récapitulatif montre les 5 manches sur une carte et le total sur 25 000.
    — *Vérification :* manipulation.
-8. [ ] « Défi partagé » produit un lien ; deux personnes qui l'ouvrent jouent les mêmes 5 lieux dans le même
+8. [x] « Défi partagé » produit un lien ; deux personnes qui l'ouvrent jouent les mêmes 5 lieux dans le même
    ordre et voient le classement du défi. — *Vérification :* test automatique + deux navigateurs.
-9. [ ] Le défi du jour change à minuit (heure de Paris), est identique pour tous, et ne se joue qu'une fois
+9. [x] Le défi du jour change à minuit (heure de Paris), est identique pour tous, et ne se joue qu'une fois
    par joueur. — *Vérification :* test automatique avec une horloge simulée.
 10. [ ] En Série de pays, une réponse juste incrémente la série, une fausse l'arrête et montre le bon pays ;
     le pays est déterminé par le serveur à partir de contours de pays embarqués (aucun service extérieur).
     — *Vérification :* test automatique sur une liste de points connus (Valence → France, Genève → Suisse…).
 11. [ ] Après chaque manche, la fiche découverte du pays s'affiche (drapeau, capitale, langue, sens de
     circulation, 2–3 indices visuels). — *Vérification :* manipulation sur 3 pays.
-12. [ ] Le mode Exploration n'affiche aucun score et révèle le lieu sur demande. — *Vérification :* manipulation.
+12. [x] Le mode Exploration n'affiche aucun score et révèle le lieu sur demande. — *Vérification :* manipulation.
 13. [ ] Le jeu est jouable sur téléphone (image plein écran, mini-carte repliable).
     — *Vérification :* manipulation sur un téléphone ou l'affichage mobile du navigateur.
 14. [ ] Tout le texte est en français. — *Vérification :* relecture de l'interface.
@@ -143,7 +143,7 @@ Chacun se vérifie par un test automatique ou par une manipulation précise.
     C'est lui qui tire les lieux, calcule distances, scores, pays et éliminations : le navigateur ne fait
     qu'afficher.
   - **Navigateur** : JavaScript sans framework ; image de rue par Google Street View (API JavaScript Maps) ;
-    mini-carte Leaflet.
+    mini-carte maison sans dépendance (tuiles OpenStreetMap ; Leaflet n'a pu être ni téléchargé ni testé hors ligne).
   - **Réserves de lieux** : pour chaque carte, un script tire à l'avance des points dans la zone et garde
     ceux où une image existe (la vérification d'existence d'image Street View est gratuite et illimitée).
     Une partie pioche dans cette réserve : pas d'image noire, pas d'attente.
@@ -163,7 +163,7 @@ Chacun se vérifie par un test automatique ou par une manipulation précise.
 - `serveur/salons.py` — salons temps réel, reconnexion, spectateurs
 - `serveur/base.py` + `serveur/migrations/` — SQLite
 - `serveur/donnees/pays.geojson`, `serveur/donnees/fiches_pays.json`, `serveur/donnees/cartes/`
-- `outils/generer_reserve.py` — remplit les réserves de lieux d'une carte
+- `outils/generer_reserve.py` + `outils/verifier_pays.py` — remplit les réserves / vérifie les contours de lieux d'une carte
 - `web/` — pages, JS du jeu, de la carte, des salons, de l'éditeur, styles
 - `tests/` — tests automatiques (score, pays, défis, duel, bataille royale, connexion, API)
 - `CLAUDE.md`, `README.md` — conventions du dépôt, lancement, mise en ligne
@@ -197,3 +197,21 @@ Chacun se vérifie par un test automatique ou par une manipulation précise.
 
 ## Questions ouvertes
 (aucune)
+
+## Livraison — étape 1 (jeu solo)
+**Fait :** serveur (score, pays, chrono, défis, série, exploration), mini-carte, écrans, fiches de 57 pays,
+6 cartes, 121 lieux de démonstration, générateur de réserve Street View, 42 tests (tous verts, mutations
+volontaires détectées). Tous les modes de l'étape 1 sont livrés en un seul lot, pas deux.
+
+**Écart à la spec :** mini-carte écrite à la main au lieu de Leaflet (non téléchargeable ici, donc intestable).
+
+**Cochés** : 2, 3, 4, 6, 7, 8, 9, 12. **Non cochés, à vérifier à la main :**
+- 1 et 5 : vrai Street View (image 360°, flèches, rotation, zoom) — seul le mode « factice » a été testé.
+- 10 : la logique est prouvée avec un fichier de test à 3 pays ; il manque `pays.geojson` (voir
+  `serveur/donnees/LISEZMOI.md`), puis `python3 outils/verifier_pays.py`.
+- 11 : relire les fiches pays (contenu écrit de mémoire). 13 : essai sur un vrai téléphone. 14 : relecture du texte.
+
+**Avant la mise en ligne (étape 4) :** deux clés Google distinctes avec plafond et budget ; limite de débit
+nginx sur `/api/parties` et `/api/defis` ; cookie `Secure` ; page « Données et vie privée » et purge des
+anciennes parties ; liste de pseudos refusés ou retrait d'une ligne du classement public (à décider) ;
+en-têtes de sécurité. Relecture `gardien-enfants` faite sur l'étape 1 ; à refaire sur les étapes 2 et 3.

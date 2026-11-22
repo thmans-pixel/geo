@@ -79,7 +79,7 @@ Chacun se vérifie par un test automatique ou par une manipulation précise.
    ordre et voient le classement du défi. — *Vérification :* test automatique + deux navigateurs.
 9. [x] Le défi du jour change à minuit (heure de Paris), est identique pour tous, et ne se joue qu'une fois
    par joueur. — *Vérification :* test automatique avec une horloge simulée.
-10. [ ] En Série de pays, une réponse juste incrémente la série, une fausse l'arrête et montre le bon pays ;
+10. [x] En Série de pays, une réponse juste incrémente la série, une fausse l'arrête et montre le bon pays ;
     le pays est déterminé par le serveur à partir de contours de pays embarqués (aucun service extérieur).
     — *Vérification :* test automatique sur une liste de points connus (Valence → France, Genève → Suisse…).
 11. [ ] Après chaque manche, la fiche découverte du pays s'affiche (drapeau, capitale, langue, sens de
@@ -205,10 +205,10 @@ volontaires détectées). Tous les modes de l'étape 1 sont livrés en un seul l
 
 **Écart à la spec :** mini-carte écrite à la main au lieu de Leaflet (non téléchargeable ici, donc intestable).
 
-**Cochés** : 2, 3, 4, 6, 7, 8, 9, 12. **Non cochés, à vérifier à la main :**
+**Cochés** : 2, 3, 4, 6, 7, 8, 9, 10, 12 (le 2 et le 10 aussi vérifiés à la main par Thibault le 2026-11-23 :
+score de 127 points pour 5 483 km sur Monde, clic aux États-Unis reconnu avec les vrais contours Natural Earth 50 m,
+`verifier_pays.py` : 121 lieux sur 121 dans le bon pays). **Non cochés, à vérifier à la main :**
 - 1 et 5 : vrai Street View (image 360°, flèches, rotation, zoom) — seul le mode « factice » a été testé.
-- 10 : la logique est prouvée avec un fichier de test à 3 pays ; il manque `pays.geojson` (voir
-  `serveur/donnees/LISEZMOI.md`), puis `python3 outils/verifier_pays.py`.
 - 11 : relire les fiches pays (contenu écrit de mémoire). 13 : essai sur un vrai téléphone. 14 : relecture du texte.
 
 **Avant la mise en ligne (étape 4) :** deux clés Google distinctes avec plafond et budget ; limite de débit

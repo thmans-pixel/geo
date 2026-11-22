@@ -54,6 +54,41 @@ MIGRATIONS = [
         PRIMARY KEY (joueur_id, cle)
     );
     """,
+    # 2 : comptes (identifiants YunoHost, jamais de mot de passe), succès, cartes personnalisées
+    """
+    CREATE TABLE comptes (
+        identifiant TEXT PRIMARY KEY,
+        pseudo TEXT NOT NULL,
+        cree_le REAL NOT NULL,
+        xp INTEGER NOT NULL DEFAULT 0
+    );
+    CREATE TABLE succes (
+        identifiant TEXT NOT NULL REFERENCES comptes(identifiant),
+        code TEXT NOT NULL,
+        obtenu_le REAL NOT NULL,
+        PRIMARY KEY (identifiant, code)
+    );
+    ALTER TABLE parties ADD COLUMN compte TEXT REFERENCES comptes(identifiant);
+    CREATE INDEX parties_compte ON parties(compte);
+    CREATE TABLE cartes_perso (
+        id TEXT PRIMARY KEY,
+        nom TEXT NOT NULL,
+        description TEXT NOT NULL DEFAULT '',
+        bbox_json TEXT NOT NULL,
+        diagonale_km REAL NOT NULL,
+        auteur TEXT NOT NULL,
+        cree_le REAL NOT NULL,
+        archivee INTEGER NOT NULL DEFAULT 0
+    );
+    CREATE TABLE lieux_perso (
+        carte_id TEXT NOT NULL REFERENCES cartes_perso(id) ON DELETE CASCADE,
+        pano_id TEXT NOT NULL,
+        lat REAL NOT NULL,
+        lon REAL NOT NULL,
+        pays TEXT,
+        PRIMARY KEY (carte_id, pano_id)
+    );
+    """,
 ]
 
 

@@ -1,4 +1,6 @@
 """Application web « Où suis-je ? » : API JSON + pages statiques."""
+import asyncio
+import re
 import secrets
 from pathlib import Path
 
@@ -9,10 +11,11 @@ from starlette.responses import JSONResponse
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
-from . import config
-from .jeu import cartes, fiches, lieux, moteur
+from . import base, config, horloge, identite
+from .jeu import cartes, cartes_perso, fiches, lieux, moteur, profil, progression
 from .jeu.moteur import ErreurJeu
 
+COOKIE_VALIDE = re.compile(r"^[A-Za-z0-9_-]{8,64}$")   # jamais « c:… » : cette forme est réservée aux comptes
 WEB = Path(__file__).resolve().parent.parent / "web"
 
 
@@ -21,7 +24,7 @@ class Joueur(BaseHTTPMiddleware):
 
     async def dispatch(self, request, call_next):
         ident = request.cookies.get("joueur_id")
-        neuf = not ident or len(ident) > 64
+        neuf = not ident or not COOKIE_VALIDE.match(ident)
         if neuf:
             ident = secrets.token_urlsafe(12)
         request.state.joueur_id = ident
@@ -51,7 +54,8 @@ def _json(f):
 
 @_json
 async def api_config(request):
-    return {"images": config.fournisseur_images(), "cle_google": config.cle_google()}
+    return {"images": config.fournisseur_images(), "cle_google": config.cle_google(),
+            "url_connexion": config.url_connexion()}
 
 
 @_json
@@ -71,7 +75,7 @@ async def api_creer_partie(request):
     b = await _corps(request)
     ident = moteur.creer_partie(request.state.joueur_id, b.get("mode"), b.get("carte"),
                                 b.get("contrainte", "libre"), b.get("chrono", 0), b.get("pseudo", ""),
-                                b.get("defi_id"))
+                                b.get("defi_id"), identite.compte(request))
     return {"id": ident}
 
 
@@ -115,7 +119,6 @@ async def api_defi(request):
 
 @_json
 async def api_defi_du_jour(request):
-    from . import base, horloge
     with base.connexion() as c:
         moteur._defi_jour(c)
     return moteur.infos_defi(request.state.joueur_id, f"jour-{horloge.jour_paris()}")
@@ -124,6 +127,80 @@ async def api_defi_du_jour(request):
 @_json
 async def api_fiche(request):
     return fiches.fiche(request.path_params["code"].upper()[:2])
+
+
+def _verifier_requete(request):
+    """Les actions qui modifient un compte ou une carte exigent un en-tête qu'un autre site ne peut pas poser
+    sans autorisation (protège contre les requêtes envoyées depuis une page tierce)."""
+    if request.headers.get("X-Requete") != "ou-suis-je":
+        raise ErreurJeu(400, "Requête refusée.")
+
+
+def _admin(request) -> dict:
+    cpt = identite.compte(request)
+    if cpt is None:
+        raise ErreurJeu(401, "Connexion nécessaire.")
+    if not cpt["admin"]:
+        raise ErreurJeu(403, "Réservé à l'administrateur.")
+    return cpt
+
+
+@_json
+async def api_moi(request):
+    cpt = identite.compte(request)
+    if cpt is None:
+        return {"connecte": False, "url_connexion": config.url_connexion()}
+    return {"connecte": True, **cpt, "niveau": progression.etat_niveau(cpt["xp"])}
+
+
+@_json
+async def api_pseudo(request):
+    _verifier_requete(request)
+    cpt = identite.compte(request)
+    if cpt is None:
+        raise ErreurJeu(401, "Connexion nécessaire.")
+    pseudo = moteur.nettoyer_pseudo((await _corps(request)).get("pseudo"))
+    if not pseudo:
+        raise ErreurJeu(400, "Pseudo vide ou invalide.")
+    with base.connexion() as c:
+        c.execute("UPDATE comptes SET pseudo=? WHERE identifiant=?", (pseudo, cpt["identifiant"]))
+    return {"pseudo": pseudo}
+
+
+@_json
+async def api_profil(request):
+    cpt = identite.compte(request)
+    if cpt is None:
+        raise ErreurJeu(401, "Connexion nécessaire.")
+    return profil.profil(cpt)
+
+
+@_json
+async def api_classements(request):
+    return profil.classements(request.query_params.get("carte", "monde"))
+
+
+@_json
+async def api_admin_cartes(request):
+    _admin(request)
+    return {"cartes": cartes_perso.lister()}
+
+
+@_json
+async def api_admin_creer_carte(request):
+    _verifier_requete(request)
+    cpt = _admin(request)
+    corps = await _corps(request)
+    # La vérification interroge Google (lent) : hors de la boucle pour ne pas bloquer les autres joueurs.
+    return await asyncio.to_thread(cartes_perso.creer, cpt["identifiant"], corps)
+
+
+@_json
+async def api_admin_archiver(request):
+    _verifier_requete(request)
+    _admin(request)
+    cartes_perso.archiver(request.path_params["id"])
+    return {"ok": True}
 
 
 def creer_app() -> Starlette:
@@ -141,6 +218,13 @@ def creer_app() -> Starlette:
             Route("/api/defis/{id}", api_defi),
             Route("/api/defi-du-jour", api_defi_du_jour),
             Route("/api/pays/{code}", api_fiche),
+            Route("/api/moi", api_moi),
+            Route("/api/moi/pseudo", api_pseudo, methods=["POST"]),
+            Route("/api/moi/profil", api_profil),
+            Route("/api/classements", api_classements),
+            Route("/api/admin/cartes", api_admin_cartes),
+            Route("/api/admin/cartes", api_admin_creer_carte, methods=["POST"]),
+            Route("/api/admin/cartes/{id}", api_admin_archiver, methods=["DELETE"]),
             Mount("/", StaticFiles(directory=WEB, html=True), name="web"),
         ],
         middleware=[Middleware(Joueur)],

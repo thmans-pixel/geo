@@ -3,6 +3,8 @@
   "use strict";
   const app = document.getElementById("app");
   let config = { images: "factice" };
+  let moi = { connecte: false };
+  let succesEnAttente = [];   // succès gagnés, à montrer sur l'écran de résultat
   let cartes = [];
   let nettoyages = [];   // minuteurs, cartes, images à défaire en changeant d'écran
 
@@ -31,8 +33,12 @@
   function nettoyer() { nettoyages.forEach((f) => { try { f(); } catch (_) {} }); nettoyages = []; }
 
   async function api(chemin, corps) {
-    const options = corps === undefined ? {} :
-      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corps) };
+    // « X-Requete » : exigé par le serveur pour toute action qui modifie un compte ou une carte.
+    const options = { headers: { "X-Requete": "ou-suis-je" } };
+    if (corps === "SUPPRIMER") options.method = "DELETE";
+    else if (corps !== undefined) {
+      options.method = "POST"; options.headers["Content-Type"] = "application/json"; options.body = JSON.stringify(corps);
+    }
     const r = await fetch(chemin, options);
     let data = {};
     try { data = await r.json(); } catch (_) {}
@@ -51,11 +57,31 @@
       '</p><p><a class="bouton" href="/">Retour à l\'accueil</a></p></main>';
   }
 
+  // ---------------------------------------------------------------- barre du haut
+  function barre() {
+    const liens = moi.connecte
+      ? `<a href="/?profil=1">👤 ${esc(moi.pseudo)} · niv. ${moi.niveau.niveau}</a><a href="/?classements=1">Classements</a>` +
+        (moi.admin ? '<a href="/?editeur=1">Éditeur de cartes</a>' : "")
+      : `<a href="/?classements=1">Classements</a><a href="${esc(moi.url_connexion || "/")}" id="connexion">Se connecter</a>`;
+    return `<nav class="barre" aria-label="Menu"><a href="/" class="marque">Où suis-je ?</a><span>${liens}</span></nav>`;
+  }
+  function lierBarre() {
+    app.querySelectorAll(".barre a, .retour").forEach((a) => {
+      const h = a.getAttribute("href");
+      if (h && h.startsWith("/") && !h.startsWith("/yunohost")) a.onclick = (e) => { e.preventDefault(); aller(h); };
+    });
+  }
+  function annoncesSucces(liste) {
+    if (!liste || !liste.length) return "";
+    return `<div class="succes-gagne" role="status">${liste.map((x) => `🏅 Succès : <strong>${esc(x.nom)}</strong> (+50 XP)`).join("<br>")}</div>`;
+  }
+
   // ---------------------------------------------------------------- accueil
   async function accueil() {
     nettoyer();
     const jour = await api("/api/defi-du-jour").catch(() => null);
     app.innerHTML = `
+      ${barre()}
       <main class="accueil">
         <h1>Où suis-je ?</h1>
         <p class="sous-titre">Regarde autour de toi, repère-toi sur la carte, devine où tu es dans le monde.</p>
@@ -66,7 +92,7 @@
             </button>`).join("")}
         </div>
         <form id="reglages" class="reglages" autocomplete="off">
-          <label>Ton pseudo <input name="pseudo" maxlength="20" placeholder="Invité" value="${esc(pseudoStocke())}"><small>Écris un surnom, pas ton vrai nom.</small></label>
+          ${moi.connecte ? "" : `<label>Ton pseudo <input name="pseudo" maxlength="20" placeholder="Invité" value="${esc(pseudoStocke())}"><small>Écris un surnom, pas ton vrai nom.</small></label>`}
           <label data-champ="carte">Carte
             <select name="carte">${cartes.map((c) => `<option value="${esc(c.id)}"${c.nb_lieux < 5 ? " disabled" : ""}>${esc(c.nom)}</option>`).join("")}</select>
           </label>
@@ -83,6 +109,7 @@
         <section class="encadre" id="classement-jour">${jour ? classementHtml("Défi du jour", jour.classement) : ""}</section>
       </main>`;
 
+    lierBarre();
     const form = document.getElementById("reglages");
     const message = document.getElementById("message");
     let mode = "classique";
@@ -102,8 +129,8 @@
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const f = new FormData(form);
-      const pseudo = String(f.get("pseudo") || "").trim();
-      stockerPseudo(pseudo);
+      const pseudo = moi.connecte ? moi.pseudo : String(f.get("pseudo") || "").trim();
+      if (!moi.connecte) stockerPseudo(pseudo);
       const reglages = { carte: f.get("carte"), contrainte: f.get("contrainte"), chrono: Number(f.get("chrono")), pseudo };
       message.hidden = true;
       try {
@@ -142,11 +169,12 @@
     nettoyer();
     const d = await api("/api/defis/" + encodeURIComponent(id));
     app.innerHTML = `
+      ${barre()}
       <main class="accueil">
         <h1>${esc(d.nom)}</h1>
         <p class="sous-titre">${d.nb_manches} lieux sur la carte « ${esc(d.carte_nom)} » — ${esc(CONTRAINTES[d.contrainte])} — ${esc(CHRONOS[d.chrono])}.</p>
         <form id="rejoindre" class="reglages">
-          <label>Ton pseudo <input name="pseudo" maxlength="20" placeholder="Invité" value="${esc(pseudoStocke())}"><small>Écris un surnom, pas ton vrai nom.</small></label>
+          ${moi.connecte ? `<p>Tu joues sous le pseudo <strong>${esc(moi.pseudo)}</strong>.</p>` : `<label>Ton pseudo <input name="pseudo" maxlength="20" placeholder="Invité" value="${esc(pseudoStocke())}"><small>Écris un surnom, pas ton vrai nom.</small></label>`}
           ${d.deja_joue ? '<button type="submit" class="bouton gros" id="jouer">Voir ma partie</button>'
                         : '<button type="submit" class="bouton gros" id="jouer">Jouer ce défi</button>'}
         </form>
@@ -154,11 +182,12 @@
         <section class="encadre">${classementHtml("Classement", d.classement)}</section>
         <p><a href="/">Autres modes de jeu</a></p>
       </main>`;
+    lierBarre();
     document.getElementById("rejoindre").addEventListener("submit", async (e) => {
       e.preventDefault();
       if (d.deja_joue) { aller("/?partie=" + encodeURIComponent(d.deja_joue.partie_id)); return; }
-      const pseudo = String(new FormData(e.target).get("pseudo") || "").trim();
-      stockerPseudo(pseudo);
+      const pseudo = moi.connecte ? moi.pseudo : String(new FormData(e.target).get("pseudo") || "").trim();
+      if (!moi.connecte) stockerPseudo(pseudo);
       try {
         const p = await api("/api/parties", { mode: "defi", defi_id: id, pseudo });
         aller("/?partie=" + encodeURIComponent(p.id));
@@ -215,7 +244,7 @@
 
     if (expl) {
       document.getElementById("reveler").onclick = async () => {
-        try { await api("/api/parties/" + encodeURIComponent(p.id) + "/reveler", {}); await partie(p.id); }
+        try { const rv = await api("/api/parties/" + encodeURIComponent(p.id) + "/reveler", {}); succesEnAttente = rv.nouveaux_succes || []; await partie(p.id); }
         catch (e) { message.textContent = e.message; message.hidden = false; }
       };
       return;
@@ -242,7 +271,8 @@
     async function valider() {
       if (envoye) return; envoye = true; bouton.disabled = true;
       try {
-        await api("/api/parties/" + encodeURIComponent(p.id) + "/reponse", choix ? { lat: choix.lat, lon: choix.lon } : {});
+        const rep = await api("/api/parties/" + encodeURIComponent(p.id) + "/reponse", choix ? { lat: choix.lat, lon: choix.lon } : {});
+        succesEnAttente = rep.nouveaux_succes || [];
       } catch (err) { if (err.statut !== 409) { envoye = false; message.textContent = err.message; message.hidden = false; return; } }
       await partie(p.id);
     }
@@ -298,12 +328,14 @@
         <aside class="res-panneau">
           <p class="manche-titre">${esc(titreManche(etat))}</p>
           ${haut}
+          ${annoncesSucces(succesEnAttente)}
           ${ficheHtml(r.fiche)}
           <p id="message" class="erreur" role="alert" hidden></p>
           <div class="actions">${action}</div>
         </aside>
       </div>`;
 
+    succesEnAttente = [];
     const carte = new Carte(document.getElementById("res-carte"), { actif: false });
     nettoyages.push(() => carte.detruire());
     const points = [[r.lieu.lat, r.lieu.lon]];
@@ -370,12 +402,153 @@
     };
   }
 
+  // ---------------------------------------------------------------- profil
+  async function pageProfil() {
+    nettoyer();
+    if (!moi.connecte) { location.href = moi.url_connexion || "/"; return; }
+    const p = await api("/api/moi/profil");
+    const n = p.niveau, pct = Math.round(100 * (n.xp - n.xp_debut) / Math.max(1, n.xp_suivant - n.xp_debut));
+    const paysLi = (l) => l.length ? `<ol class="classement">${l.map((x) =>
+      `<li><span>${esc(x.nom)}</span><strong>${Math.round(100 * x.taux)} % (${x.manches} manches)</strong></li>`).join("")}</ol>`
+      : '<p class="discret">Pas encore assez de manches (3 par pays).</p>';
+    const modes = { classique: "Classique", defi: "Défi", defi_jour: "Défi du jour", serie: "Série", exploration: "Exploration" };
+    app.innerHTML = `${barre()}
+      <main class="accueil">
+        <h1>${esc(p.compte.pseudo)}</h1>
+        <p class="sous-titre">Compte « ${esc(p.compte.identifiant)} » — niveau <strong>${n.niveau}</strong>, ${nombre(n.xp)} XP</p>
+        <div class="jauge" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><div style="width:${pct}%"></div></div>
+        <p class="discret">Prochain niveau à ${nombre(n.xp_suivant)} XP.</p>
+        <form id="form-pseudo" class="reglages">
+          <label>Mon pseudo <input name="pseudo" maxlength="20" value="${esc(p.compte.pseudo)}"><small>Un surnom, pas ton vrai nom. Il est visible dans les classements.</small></label>
+          <button class="bouton" type="submit">Changer</button>
+        </form>
+        <p id="message" class="erreur" role="alert" hidden></p>
+        <section class="encadre"><h2>Statistiques</h2>
+          <p>Parties terminées : <strong>${p.parties_jouees}</strong> — distance moyenne : <strong>${esc(distance(p.distance_moyenne_m))}</strong></p>
+          ${p.meilleurs_scores.length ? `<h3>Meilleurs scores</h3><ol class="classement">${p.meilleurs_scores.map((x) =>
+            `<li><span>${esc(x.nom)}</span><strong>${nombre(x.total)} pts</strong></li>`).join("")}</ol>` : ""}
+          ${Object.keys(p.records_serie).length ? `<h3>Records en Série</h3><ul>${Object.entries(p.records_serie).map(([k, v]) =>
+            `<li>${esc(k)} : <strong>${v}</strong></li>`).join("")}</ul>` : ""}
+          <h3>Pays les mieux reconnus</h3>${paysLi(p.pays_mieux_reconnus)}
+          <h3>Pays à retravailler</h3>${paysLi(p.pays_moins_bien_reconnus)}
+        </section>
+        <section class="encadre"><h2>Succès</h2>
+          <ul class="succes">${p.succes.map((x) => `<li class="${x.obtenu ? "obtenu" : ""}"><strong>${x.obtenu ? "🏅" : "🔒"} ${esc(x.nom)}</strong><span>${esc(x.description)}</span></li>`).join("")}</ul>
+        </section>
+        <section class="encadre"><h2>Dernières parties</h2>
+          ${p.historique.length ? `<ol class="classement">${p.historique.map((h) =>
+            `<li><span>${esc(modes[h.mode] || h.mode)} — ${esc(h.carte)} <small class="discret">${new Date(h.date * 1000).toLocaleDateString("fr-FR")}</small></span><strong>${nombre(h.total)}</strong></li>`).join("")}</ol>`
+            : '<p class="discret">Aucune partie terminée.</p>'}
+        </section>
+      </main>`;
+    lierBarre();
+    document.getElementById("form-pseudo").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const m = document.getElementById("message");
+      try {
+        const r = await api("/api/moi/pseudo", { pseudo: String(new FormData(e.target).get("pseudo") || "") });
+        moi.pseudo = r.pseudo; await pageProfil();
+      } catch (err) { m.textContent = err.message; m.hidden = false; }
+    });
+  }
+
+  // ---------------------------------------------------------------- classements
+  async function pageClassements(carteId) {
+    nettoyer();
+    const d = await api("/api/classements?carte=" + encodeURIComponent(carteId || "monde"));
+    const liste = (titre, l) => l.length ? classementHtml(titre, l) : `<h2>${esc(titre)}</h2><p class="discret">Personne pour l'instant.</p>`;
+    app.innerHTML = `${barre()}
+      <main class="accueil">
+        <h1>Classements</h1>
+        <p class="sous-titre">Seuls les joueurs connectés avec un compte y figurent.</p>
+        <label class="reglages">Carte
+          <select id="choix-carte">${cartes.map((c) => `<option value="${esc(c.id)}"${c.id === d.carte ? " selected" : ""}>${esc(c.nom)}</option>`).join("")}</select>
+        </label>
+        <section class="encadre">${liste("Meilleur score (Classique)", d.par_carte)}</section>
+        <section class="encadre">${liste("Défi du jour", d.defi_du_jour)}</section>
+        <section class="encadre">${liste("Record de la Série (pays d'affilée)", d.serie).replace(/ pts/g, "")}</section>
+      </main>`;
+    lierBarre();
+    document.getElementById("choix-carte").onchange = (e) => aller("/?classements=1&carte=" + encodeURIComponent(e.target.value));
+  }
+
+  // ---------------------------------------------------------------- éditeur de cartes (administrateur)
+  async function pageEditeur() {
+    nettoyer();
+    if (!moi.admin) { aller("/", true); return; }
+    const existantes = (await api("/api/admin/cartes")).cartes;
+    app.innerHTML = `${barre()}
+      <main class="accueil editeur">
+        <h1>Éditeur de cartes</h1>
+        <p class="sous-titre">Clique sur la carte pour poser des lieux, ou trace une zone. Seuls les endroits où Street View existe sont gardés.</p>
+        <div class="reglages">
+          <label>Nom de la carte <input id="e-nom" maxlength="40"></label>
+          <label>Description <input id="e-desc" maxlength="120"></label>
+          <label>Façon de faire
+            <select id="e-mode"><option value="points">Des lieux précis (clic)</option><option value="zone">Une zone (polygone)</option></select>
+          </label>
+          <label id="e-nombre-l" hidden>Nombre de lieux à trouver <input id="e-nombre" type="number" min="5" max="150" value="60"></label>
+        </div>
+        <div id="e-carte" class="e-carte"></div>
+        <p id="e-compte" class="discret"></p>
+        <div class="actions"><button class="bouton" id="e-annuler">Retirer le dernier point</button>
+          <button class="bouton" id="e-vider">Tout effacer</button>
+          <button class="bouton gros" id="e-creer">Créer la carte</button></div>
+        <p id="message" class="erreur" role="alert" hidden></p>
+        <p id="e-ok" class="succes-gagne" role="status" hidden></p>
+        <section class="encadre"><h2>Cartes créées</h2>
+          ${existantes.length ? `<ul class="succes">${existantes.map((c) => `<li><strong>${esc(c.nom)}</strong><span>${c.lieux} lieux · par ${esc(c.auteur)} ·
+            <button class="bouton archiver" data-id="${esc(c.id)}">Archiver</button></span></li>`).join("")}</ul>` : '<p class="discret">Aucune carte personnalisée.</p>'}
+        </section>
+      </main>`;
+    lierBarre();
+    const carte = new Carte(document.getElementById("e-carte"), { actif: true, onClic: (lat, lon) => { pts.push([lat, lon]); maj(); } });
+    nettoyages.push(() => carte.detruire());
+    carte.vue(30, 10, 2);
+    const pts = [];
+    const modeSel = document.getElementById("e-mode");
+    function maj() {
+      carte.effacer();
+      const zone = modeSel.value === "zone";
+      pts.forEach((x, i) => {
+        carte.repere("p" + i, x[0], x[1], { couleur: "#2a7de1", etiquette: String(i + 1) });
+        if (zone && i > 0) carte.ligne("l" + i, pts[i - 1], x);
+      });
+      if (zone && pts.length > 2) carte.ligne("fin", pts[pts.length - 1], pts[0]);
+      document.getElementById("e-compte").textContent = pts.length + (zone ? " sommet(s) (3 à 100)" : " lieu(x) (1 à 200)");
+      document.getElementById("e-nombre-l").hidden = !zone;
+    }
+    modeSel.onchange = () => { pts.length = 0; maj(); };
+    document.getElementById("e-annuler").onclick = () => { pts.pop(); maj(); };
+    document.getElementById("e-vider").onclick = () => { pts.length = 0; maj(); };
+    maj();
+    const m = document.getElementById("message"), ok = document.getElementById("e-ok");
+    document.getElementById("e-creer").onclick = async (ev) => {
+      const b = ev.target; m.hidden = ok.hidden = true; b.disabled = true; b.textContent = "Vérification en cours…";
+      const corps = { nom: document.getElementById("e-nom").value, description: document.getElementById("e-desc").value, mode: modeSel.value };
+      if (modeSel.value === "zone") { corps.zone = pts; corps.nombre = Number(document.getElementById("e-nombre").value); } else corps.points = pts;
+      try {
+        const r = await api("/api/admin/cartes", corps);
+        cartes = (await api("/api/cartes")).cartes;
+        ok.textContent = "Carte « " + r.nom + " » créée avec " + r.retenus + " lieux."; ok.hidden = false;
+      } catch (err) { m.textContent = err.message; m.hidden = false; }
+      b.disabled = false; b.textContent = "Créer la carte";
+    };
+    app.querySelectorAll(".archiver").forEach((b) => { b.onclick = async () => {
+      try { await api("/api/admin/cartes/" + encodeURIComponent(b.dataset.id), "SUPPRIMER"); cartes = (await api("/api/cartes")).cartes; await pageEditeur(); }
+      catch (err) { m.textContent = err.message; m.hidden = false; }
+    }; });
+  }
+
   // ---------------------------------------------------------------- démarrage
   async function route() {
     const q = new URLSearchParams(location.search);
     try {
       if (q.get("partie")) await partie(q.get("partie"), q.get("recap") === "1");
       else if (q.get("defi")) await pageDefi(q.get("defi"));
+      else if (q.get("profil")) await pageProfil();
+      else if (q.get("classements")) await pageClassements(q.get("carte"));
+      else if (q.get("editeur")) await pageEditeur();
       else await accueil();
     } catch (e) { erreurFatale(e); }
   }
@@ -384,6 +557,7 @@
   (async function init() {
     try {
       config = await api("/api/config");
+      moi = await api("/api/moi");
       cartes = (await api("/api/cartes")).cartes;
     } catch (e) { return erreurFatale(e); }
     route();

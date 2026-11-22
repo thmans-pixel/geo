@@ -3,7 +3,9 @@
 Un jeu de géolocalisation façon GeoGuessr, en français, pour jouer en famille et entre amis.
 
 **Modes** : Classique (5 manches), Défi du jour, Défi à partager par lien, Série de pays, Exploration.
-(Comptes, statistiques, cartes personnalisées puis multijoueur arrivent dans les étapes 2 à 4 de la spec.)
+**Comptes** : les comptes sont ceux de YunoHost (aucune inscription sur le site, aucun mot de passe stocké). Une fois connecté :
+profil, statistiques, succès, niveaux, classements. L'administrateur dispose en plus d'un éditeur de cartes.
+(Le multijoueur arrive dans les étapes 3 et 4 de la spec.)
 
 ## Essayer tout de suite (sans compte Google, sans rien payer)
 
@@ -12,6 +14,16 @@ Un jeu de géolocalisation façon GeoGuessr, en français, pour jouer en famille
 
 Ouvrir http://localhost:8000 : les images sont des fonds de couleur (mode « factice »), mais toutes les
 règles, les scores, les défis et la carte fonctionnent.
+
+## Comptes (YunoHost)
+
+Le site lit l'identifiant de la personne connectée dans un en-tête posé par le reverse proxy (SSO YunoHost).
+- `OUSUISJE_ENTETE` : nom de l'en-tête (défaut `Remote-User`) ; `OUSUISJE_ADMIN` : identifiant de l'administrateur ;
+  `OUSUISJE_URL_CONNEXION` : adresse du portail de connexion (défaut `/yunohost/sso/`).
+- **L'application doit écouter sur 127.0.0.1 uniquement, derrière nginx, et nginx doit remplacer cet en-tête** :
+  sinon n'importe qui pourrait se faire passer pour un compte. Le code ne croit l'en-tête que s'il arrive de 127.0.0.1 ;
+  en plus, `OUSUISJE_SECRET_PROXY=<secret>` exige que nginx pose `X-Auth-Secret: <secret>` (recommandé).
+- Essai local : `OUSUISJE_COMPTE_ESSAI=thibault OUSUISJE_ADMIN=thibault` (ignoré en mode `google`).
 
 ## Avec les vraies images Street View
 

@@ -198,3 +198,74 @@ def test_accueil_en_francais(navigateur, site):  # critère 14 (contrôle partie
         assert mot in texte
     assert page.get_attribute("html", "lang") == "fr"
     ctx.close()
+
+
+# ------------------------------------------------------------ étape 2 : comptes, profil, éditeur
+
+def test_invite_voit_se_connecter_et_garde_son_pseudo(site, navigateur):  # critère 16
+    ctx, page = nouvelle_page(navigateur, site)
+    page.goto(site)
+    page.wait_for_selector(".modes")
+    assert page.locator("#connexion").is_visible()
+    assert page.locator('input[name="pseudo"]').is_visible()
+    page.goto(site + "/?profil=1")                       # un invité n'a pas de profil
+    page.wait_for_timeout(300)
+    assert not page.erreurs
+    ctx.close()
+
+
+def test_membre_profil_et_succes(site, navigateur):  # critères 16, 17, 18
+    ctx, page = nouvelle_page(navigateur, site, extra_http_headers={"Remote-User": "thibault"})
+    page.goto(site)
+    page.wait_for_selector(".modes")
+    assert not page.locator('input[name="pseudo"]').is_visible()          # le pseudo vient du compte
+    assert "Joueur-" in page.locator(".barre").inner_text()
+    page.click("#jouer")
+    for i in range(5):
+        page.wait_for_selector("#valider")
+        poser_repere(page)
+        page.click("#valider")
+        page.wait_for_selector("#suite")
+        if i == 4:
+            assert "Première partie" in page.locator(".succes-gagne").inner_text()
+        page.click("#suite")
+    page.wait_for_selector("#recap-total")
+    page.goto(site + "/?profil=1")
+    page.wait_for_selector("#form-pseudo")
+    assert "Parties terminées : 1" in page.inner_text("main")
+    assert page.locator(".succes li.obtenu").count() >= 1
+    page.fill('#form-pseudo input[name="pseudo"]', "Zoé")
+    page.click('#form-pseudo button')
+    page.wait_for_selector("h1:has-text('Zoé')")
+    assert not page.erreurs
+    ctx.close()
+
+
+def test_editeur_reserve_a_l_admin_et_cree_une_carte(site, navigateur, monkeypatch):  # critère 20
+    monkeypatch.setenv("OUSUISJE_ADMIN", "thibault")
+    ctx, page = nouvelle_page(navigateur, site, extra_http_headers={"Remote-User": "leo"})
+    page.goto(site + "/?editeur=1")
+    page.wait_for_selector(".modes")                     # renvoyé à l'accueil
+    assert page.locator(".editeur").count() == 0
+    ctx.close()
+
+    ctx, page = nouvelle_page(navigateur, site, extra_http_headers={"Remote-User": "thibault"})
+    page.goto(site)
+    page.wait_for_selector(".modes")
+    page.click("text=Éditeur de cartes")
+    page.wait_for_selector("#e-carte")
+    page.fill("#e-nom", "Test éditeur")
+    page.select_option("#e-mode", "zone")
+    # un triangle en France : on le place avec la projection de la carte (clic aux pixels)
+    boite = page.locator("#e-carte").bounding_box()
+    page.evaluate("""() => { window.__c = document.querySelector('#e-carte'); }""")
+    for dx, dy in ((0.48, 0.40), (0.52, 0.40), (0.50, 0.46)):
+        page.mouse.click(boite["x"] + boite["width"] * dx, boite["y"] + boite["height"] * dy)
+    assert page.locator("#e-compte").inner_text().startswith("3 sommet")
+    page.fill("#e-nombre", "6")
+    page.click("#e-creer")
+    page.wait_for_selector("#e-ok:not([hidden]), #message:not([hidden])", timeout=20000)
+    texte = page.locator("#e-ok").inner_text() + page.locator("#message").inner_text()
+    assert "créée" in texte or "Seulement" in texte                      # créée, ou refus clair faute d'images
+    assert not page.erreurs
+    ctx.close()

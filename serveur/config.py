@@ -24,6 +24,32 @@ def cle_google_outil() -> str:
     return os.environ.get("OUSUISJE_GOOGLE_KEY_OUTIL", "")
 
 
+def entete_utilisateur() -> str:
+    """En-tête posé par le reverse proxy (SSO YunoHost) avec l'identifiant de la personne connectée."""
+    return os.environ.get("OUSUISJE_ENTETE", "Remote-User")
+
+
+def secret_proxy() -> str:
+    """Si réglé, le reverse proxy doit aussi poser l'en-tête X-Auth-Secret avec cette valeur."""
+    return os.environ.get("OUSUISJE_SECRET_PROXY", "")
+
+
+def compte_essai() -> str:
+    """Pour essayer la connexion en local. Ignoré dès que les images sont réelles (production)."""
+    if fournisseur_images() == "google":
+        return ""
+    return os.environ.get("OUSUISJE_COMPTE_ESSAI", "").strip().lower()
+
+
+def admin() -> str:
+    """Identifiant YunoHost de l'administrateur (éditeur de cartes, compteur d'images)."""
+    return os.environ.get("OUSUISJE_ADMIN", "").strip().lower()
+
+
+def url_connexion() -> str:
+    return os.environ.get("OUSUISJE_URL_CONNEXION", "/yunohost/sso/")
+
+
 def chemin_pays() -> Path:
     return Path(os.environ.get("OUSUISJE_PAYS", DONNEES / "pays.geojson"))
 

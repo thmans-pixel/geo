@@ -107,10 +107,10 @@ Chacun se vérifie par un test automatique ou par une manipulation précise.
     — *Vérification :* créer « La Drôme » avec une zone, jouer une partie dessus.
 
 ### Étape 3 — Multijoueur en temps réel
-21. [ ] L'hôte crée un salon, obtient un code à 6 caractères ; les autres le rejoignent avec ce code
+21. [x] L'hôte crée un salon, obtient un code à 6 caractères ; les autres le rejoignent avec ce code
     (compte ou invité) ; l'hôte règle mode, carte, contraintes, chrono puis lance.
     — *Vérification :* 3 navigateurs sur le même salon.
-22. [ ] En Partie entre amis, tout le monde voit la même image en même temps ; à la fin de la manche, les
+22. [x] En Partie entre amis, tout le monde voit la même image en même temps ; à la fin de la manche, les
     repères de tous s'affichent avec un classement. — *Vérification :* 3 navigateurs.
 23. [ ] Le Duel applique la règle des points de vie et du multiplicateur ; l'adversaire voit un compte à rebours
     de 15 s dès la première réponse. — *Vérification :* test automatique de la règle + 2 navigateurs.
@@ -118,13 +118,13 @@ Chacun se vérifie par un test automatique ou par une manipulation précise.
     — *Vérification :* test automatique.
 25. [ ] Bataille royale distance et pays : éliminations conformes aux règles du tableau ; les éliminés restent
     en spectateurs. — *Vérification :* test automatique + 3 navigateurs.
-26. [ ] On peut rejoindre un salon en **spectateur** (voit tout, ne joue pas). — *Vérification :* manipulation.
+26. [x] On peut rejoindre un salon en **spectateur** (voit tout, ne joue pas). — *Vérification :* manipulation.
 27. [ ] Un joueur dont la connexion coupe moins de 60 s reprend sa place ; au-delà, il est retiré et la
     partie continue. — *Vérification :* couper le réseau d'un onglet 20 s puis 90 s.
-28. [ ] Chaque salon a un **chat écrit libre** et des émoticônes, visibles seulement des personnes présentes
+28. [x] Chaque salon a un **chat écrit libre** et des émoticônes, visibles seulement des personnes présentes
     dans le salon ; l'hôte peut couper le chat du salon, rendre muet un joueur ou l'exclure.
     — *Vérification :* 3 navigateurs + test automatique (un joueur muet ou exclu ne peut plus écrire).
-29. [ ] Les messages du chat ne sont **enregistrés nulle part** (ni base, ni journaux) et disparaissent à la
+29. [x] Les messages du chat ne sont **enregistrés nulle part** (ni base, ni journaux) et disparaissent à la
     fermeture du salon ; longueur limitée à 200 caractères, 1 message par seconde au plus, liens non cliquables.
     — *Vérification :* test automatique + lecture de la base et des journaux après une partie.
 
@@ -232,4 +232,27 @@ pseudo par défaut sans l'identifiant (corrigé), pseudo des défis à jour (cor
 
 **Avant la mise en ligne (étape 4), en plus de l'étape 1 :** exiger `X-Requete` sur tous les POST (jeu compris) ; liste de
 pseudos refusés ou pseudos uniques ; suppression de compte et purge des parties ; migration de base atomique.
+
+## Livraison — étape 3, lot 1 (salons, Partie entre amis, chat)
+**Fait :** salons en mémoire avec code à 6 caractères, 2 à 10 joueurs, spectateurs (jusqu'à 20), réglages par l'hôte,
+Partie entre amis en 5 manches (même image pour tous, repères de tous et classement à chaque manche), reconnexion en moins de
+60 s (au-delà, la personne est retirée et la partie continue), passage de l'hôte, chat avec émoticônes (200 caractères, 1 message
+par seconde, texte brut, jamais enregistré, aucun historique pour un nouvel arrivant), pouvoirs de l'hôte : couper le chat,
+rendre muet, exclure, verrouiller le salon. 83 tests verts, dont un parcours à 3 navigateurs (hôte, ami, spectateur).
+Relecture `gardien-enfants` faite : muet contournable après déconnexion, pseudo dans l'adresse (donc dans les journaux),
+membre retiré encore actif, héritier de l'hôte resté muet, pseudos en double — tout corrigé.
+
+**Cochés :** 21, 22, 26, 28, 29 (testés ; le 21 et le 22 aussi avec 3 vrais navigateurs via un relais de test).
+**Non cochés :**
+- 27 : la logique (retrait après 60 s, reprise de place, rechargement de page) est testée, mais pas une vraie coupure réseau
+  de 20 s puis 90 s ; à essayer à la main.
+- 23, 24, 25 : Duel, équipes 2 contre 2, Batailles royales = **lot 2** de l'étape 3.
+- Essai réel : `websockets` n'était pas installable dans l'environnement de développement ; les tests passent par un relais
+  WebSocket écrit pour les tests. À vérifier à la main avec le vrai serveur : `pip install -r requirements.txt`, lancer
+  uvicorn et jouer à deux onglets.
+
+**Pour l'étape 4 (en plus des points déjà listés) :** règles nginx pour `/ws/` (en-têtes `Upgrade`, `Connection`, `Host`
+d'origine), `--no-access-log`, limite d'essais de codes de salon par IP, file d'envoi bornée par personne (un lecteur lent
+retarde les autres), plafond du critère 31 qui couvre aussi les spectateurs (chacun charge l'image), un invité exclu peut
+revenir avec un cookie neuf (parade : verrouiller le salon), badge « invité / compte » dans le chat.
 

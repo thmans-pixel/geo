@@ -5,7 +5,8 @@ Un jeu de géolocalisation façon GeoGuessr, en français, pour jouer en famille
 **Modes** : Classique (5 manches), Défi du jour, Défi à partager par lien, Série de pays, Exploration.
 **Comptes** : les comptes sont ceux de YunoHost (aucune inscription sur le site, aucun mot de passe stocké). Une fois connecté :
 profil, statistiques, succès, niveaux, classements. L'administrateur dispose en plus d'un éditeur de cartes.
-(Le multijoueur arrive dans les étapes 3 et 4 de la spec.)
+**Partie entre amis** : un salon avec un code à 6 caractères, 2 à 10 joueurs, spectateurs, chat écrit (jamais enregistré),
+reconnexion en moins de 60 s. (Duel, équipes et Batailles royales arrivent au lot suivant ; la mise en ligne à l'étape 4.)
 
 ## Essayer tout de suite (sans compte Google, sans rien payer)
 
@@ -14,6 +15,14 @@ profil, statistiques, succès, niveaux, classements. L'administrateur dispose en
 
 Ouvrir http://localhost:8000 : les images sont des fonds de couleur (mode « factice »), mais toutes les
 règles, les scores, les défis et la carte fonctionnent.
+
+## Salons en temps réel
+
+Le temps réel passe par un WebSocket : `pip install -r requirements.txt` installe `websockets`, nécessaire à uvicorn.
+Derrière nginx, la route `/ws/` doit laisser passer l'en-tête `Upgrade` (voir l'étape 4). Les salons vivent en mémoire :
+un redémarrage du service les ferme. Un seul processus uvicorn (pas de `--workers`).
+Lancer uvicorn avec `--no-access-log --ws-max-size 4096` (pas de journal d'accès, trames limitées) et jamais en `--log-level debug`
+ou `trace`, qui écrivent le contenu des trames, donc le chat.
 
 ## Comptes (YunoHost)
 

@@ -13,6 +13,7 @@
     defi_jour:   { nom: "Défi du jour", texte: "Les mêmes 5 lieux pour tout le monde, une seule tentative par jour.", champs: [], bouton: "Jouer le défi du jour" },
     defi:        { nom: "Défi à partager", texte: "Crée un lien : tes amis jouent les mêmes 5 lieux que toi.", champs: ["carte", "contrainte", "chrono"], bouton: "Créer le défi" },
     serie:       { nom: "Série de pays", texte: "Devine le pays. La série continue tant que tu as juste.", champs: ["carte", "contrainte", "chrono"], bouton: "Jouer" },
+    salon:       { nom: "Partie entre amis", texte: "2 à 10 joueurs en direct avec un code, chat et spectateurs.", champs: ["carte", "contrainte", "chrono"], bouton: "Créer un salon" },
     exploration: { nom: "Exploration", texte: "Balade-toi sans score, révèle le lieu quand tu veux.", champs: ["carte", "contrainte"], bouton: "Explorer" },
   };
   const CONTRAINTES = { libre: "Libre", sans_deplacement: "Sans déplacement", fige: "Figé (ni déplacement, ni rotation, ni zoom)" };
@@ -105,6 +106,15 @@
           <button type="submit" class="bouton gros" id="jouer">Jouer</button>
         </form>
         <p id="message" class="erreur" role="alert" hidden></p>
+        <section class="encadre" id="rejoindre-salon">
+          <h2>Un code d'ami ?</h2>
+          <form id="form-salon" class="reglages" autocomplete="off">
+            <label>Code du salon <input name="code" maxlength="6" placeholder="ABC234" style="text-transform:uppercase"></label>
+            <label class="interrupteur"><input type="checkbox" name="spectateur"> Seulement regarder</label>
+            <button class="bouton" type="submit">Rejoindre</button>
+          </form>
+          <p id="message-salon" class="erreur" role="alert" hidden></p>
+        </section>
         <section id="lien-defi" class="encadre" hidden></section>
         <section class="encadre" id="classement-jour">${jour ? classementHtml("Défi du jour", jour.classement) : ""}</section>
       </main>`;
@@ -125,6 +135,17 @@
       const b = e.target.closest(".mode"); if (b) choisir(b.dataset.mode);
     });
     choisir("classique");
+
+    document.getElementById("form-salon").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const f = new FormData(e.target), m = document.getElementById("message-salon");
+      const code = String(f.get("code") || "").replace(/\s/g, "").toUpperCase();
+      m.hidden = true;
+      try {
+        await api("/api/salons/" + encodeURIComponent(code));
+        aller("/?salon=" + encodeURIComponent(code) + (f.get("spectateur") ? "&spectateur=1" : ""));
+      } catch (err) { m.textContent = err.message; m.hidden = false; }
+    });
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -147,6 +168,11 @@
             if (navigator.clipboard) navigator.clipboard.writeText(i.value).catch(() => {});
           };
           document.getElementById("jouer-defi").onclick = (ev) => { ev.preventDefault(); aller(d.lien); };
+          return;
+        }
+        if (mode === "salon") {
+          const s = await api("/api/salons", { carte: reglages.carte, contrainte: reglages.contrainte, chrono: reglages.chrono });
+          aller("/?salon=" + encodeURIComponent(s.code));
           return;
         }
         const p = await api("/api/parties", Object.assign({ mode }, mode === "defi_jour" ? { pseudo } : reglages));
@@ -546,6 +572,11 @@
     try {
       if (q.get("partie")) await partie(q.get("partie"), q.get("recap") === "1");
       else if (q.get("defi")) await pageDefi(q.get("defi"));
+      else if (q.get("salon")) {
+        nettoyer();
+        Salon.ouvrir({ app, esc, api, aller, nombre, distance, get moi() { return moi; }, get config() { return config; }, get cartes() { return cartes; },
+          CONTRAINTES, CHRONOS, nettoyages: { push: (f) => nettoyages.push(f) } }, q.get("salon"), q.get("spectateur") === "1");
+      }
       else if (q.get("profil")) await pageProfil();
       else if (q.get("classements")) await pageClassements(q.get("carte"));
       else if (q.get("editeur")) await pageEditeur();

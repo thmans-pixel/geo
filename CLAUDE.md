@@ -23,8 +23,15 @@ Spec de référence : `docs/specs/001-jeu-geoguessr.md`. Tout le texte visible e
    Les POST de compte et d'administration exigent `X-Requete: ou-suis-je` ; les routes `/api/admin/*` vérifient `OUSUISJE_ADMIN`.
    Les classements ne montrent que des comptes, jamais des invités.
 
+8. **Le chat n'est jamais enregistré** (`serveur/salons.py`) : ni base, ni journal, ni historique renvoyé à un nouvel arrivant.
+   Ne jamais journaliser un message, ne jamais l'afficher en HTML (`textContent` seulement : pas de lien cliquable).
+   Un salon se rejoint par code seulement (pas de liste de salons). L'état envoyé aux joueurs ne contient aucune coordonnée avant la fin de manche.
+
 ## Pièges connus
 - `ISO_A2` vaut `-99` pour la France et la Norvège dans Natural Earth : `geo._code` lit `ISO_A2_EH` d'abord.
 - L'horloge passe par `serveur/horloge.py` (les tests la remplacent) ; ne pas appeler `time.time()` ailleurs.
 - Le défi du jour change à minuit **heure de Paris**.
+- `uvicorn` a besoin de la bibliothèque `websockets` pour les salons ; elle n'est pas installable dans l'environnement de
+  développement du nuage. `tests/test_salons.py` pilote donc l'application au niveau ASGI (`ClientWS`) et `tests/ws_shim.py`
+  fait le relais WebSocket des tests navigateur. Un seul processus uvicorn : les salons sont en mémoire.
 - Pas de `httpx` ici : `tests/client.py` appelle l'application ASGI directement.

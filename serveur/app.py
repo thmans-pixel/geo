@@ -2,6 +2,7 @@
 import asyncio
 import contextlib
 import json
+import logging
 import re
 import secrets
 from pathlib import Path
@@ -13,7 +14,7 @@ from starlette.responses import JSONResponse
 from starlette.routing import Mount, Route, WebSocketRoute
 from starlette.staticfiles import StaticFiles
 
-from . import base, config, horloge, identite, salons
+from . import base, config, horloge, identite, protection, quota, salons
 from .jeu import cartes, cartes_perso, fiches, lieux, moteur, profil, progression
 from .jeu.moteur import ErreurJeu
 
@@ -32,7 +33,7 @@ class Joueur(BaseHTTPMiddleware):
         request.state.joueur_id = ident
         reponse = await call_next(request)
         if neuf:
-            reponse.set_cookie("joueur_id", ident, max_age=3600 * 24 * 365, httponly=True, samesite="lax")
+            reponse.set_cookie("joueur_id", ident, max_age=3600 * 24 * 365, httponly=True, samesite="lax", secure=config.cookie_secure())
         return reponse
 
 
@@ -198,6 +199,12 @@ async def api_admin_creer_carte(request):
 
 
 @_json
+async def api_admin_usage(request):
+    _admin(request)
+    return {**quota.usage(), "derniere_purge": protection.derniere_purge["le"]}
+
+
+@_json
 async def api_admin_archiver(request):
     _verifier_requete(request)
     _admin(request)
@@ -216,6 +223,17 @@ def _cle_et_pseudo(conn, pseudo_brut):
     return cookie, moteur.nettoyer_pseudo(pseudo_brut)
 
 
+def _trouver_salon(conn, code):
+    """Cherche un salon ; trop d'essais ratés depuis la même adresse = on arrête (code à 6 caractères, 31⁶ possibilités)."""
+    ip = protection.ip_client(conn)
+    try:
+        return salons.gestionnaire.trouver(code)
+    except ErreurJeu as e:
+        if not protection.limiteur.autoriser("code-rate:" + ip, 20, 600):
+            raise ErreurJeu(429, "Trop d'essais de code : attends quelques minutes.")
+        raise
+
+
 @_json
 async def api_creer_salon(request):
     _verifier_requete(request)
@@ -228,8 +246,7 @@ async def api_creer_salon(request):
 @_json
 async def api_salon(request):
     """Le salon existe-t-il ? (pour dire « code inconnu » avant d'ouvrir la liaison temps réel)"""
-    s = salons.gestionnaire.trouver(request.path_params["code"])
-    return {"code": s.code}
+    return {"code": _trouver_salon(request, request.path_params["code"]).code}
 
 
 class Liaison:
@@ -254,7 +271,9 @@ async def ws_salon(ws):
         await ws.close(code=4403)
         return
     try:
-        salon = salons.gestionnaire.trouver(ws.path_params["code"])
+        if not protection.limiteur.autoriser("ws:" + protection.ip_client(ws), 60, 60):
+            raise ErreurJeu(429, "Trop de connexions : attends un peu.")
+        salon = _trouver_salon(ws, ws.path_params["code"])
         cle, _ = _cle_et_pseudo(ws, "")
     except ErreurJeu as e:
         await ws.accept()
@@ -302,11 +321,19 @@ async def ws_salon(ws):
 
 @contextlib.asynccontextmanager
 async def _vie(app):
-    tache = asyncio.create_task(salons.gestionnaire.boucle())
+    async def purge_quotidienne():
+        while True:
+            try:
+                await asyncio.to_thread(protection.purger)
+            except Exception:
+                logging.getLogger("uvicorn.error").warning("La purge quotidienne a échoué (voir /api/admin/usage).")
+            await asyncio.sleep(86400)
+    taches = [asyncio.create_task(salons.gestionnaire.boucle()), asyncio.create_task(purge_quotidienne())]
     try:
         yield
     finally:
-        tache.cancel()
+        for t in taches:
+            t.cancel()
 
 
 def creer_app() -> Starlette:
@@ -331,12 +358,13 @@ def creer_app() -> Starlette:
             Route("/api/moi/pseudo", api_pseudo, methods=["POST"]),
             Route("/api/moi/profil", api_profil),
             Route("/api/classements", api_classements),
+            Route("/api/admin/usage", api_admin_usage),
             Route("/api/admin/cartes", api_admin_cartes),
             Route("/api/admin/cartes", api_admin_creer_carte, methods=["POST"]),
             Route("/api/admin/cartes/{id}", api_admin_archiver, methods=["DELETE"]),
             Mount("/", StaticFiles(directory=WEB, html=True), name="web"),
         ],
-        middleware=[Middleware(Joueur)],
+        middleware=[Middleware(protection.Protection), Middleware(Joueur)],
         lifespan=_vie,
     )
 

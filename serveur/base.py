@@ -1,5 +1,6 @@
 """SQLite : connexion et migrations (numéro de version dans PRAGMA user_version)."""
 import sqlite3
+import threading
 from contextlib import contextmanager
 
 from . import config
@@ -89,14 +90,34 @@ MIGRATIONS = [
         PRIMARY KEY (carte_id, pano_id)
     );
     """,
+    # 3 : compteur d'images servies par jour (plafond de sécurité du jeu, critère 31)
+    """
+    CREATE TABLE usage_images (jour TEXT PRIMARY KEY, n INTEGER NOT NULL DEFAULT 0);
+    """,
 ]
 
 
+_migrees: set[str] = set()
+_verrou = threading.Lock()
+
+
 def _migrer(c: sqlite3.Connection) -> None:
-    version = c.execute("PRAGMA user_version").fetchone()[0]
-    for i in range(version, len(MIGRATIONS)):
-        c.executescript(MIGRATIONS[i])
-        c.execute(f"PRAGMA user_version = {i + 1}")
+    """Chaque migration est un tout : si elle échoue en route, rien n'est gardé et la base reste à l'ancienne version."""
+    chemin = str(config.chemin_base())
+    if chemin in _migrees:
+        return
+    with _verrou:
+        if chemin in _migrees:
+            return
+        version = c.execute("PRAGMA user_version").fetchone()[0]
+        for i in range(version, len(MIGRATIONS)):
+            try:
+                c.executescript(f"BEGIN IMMEDIATE;\n{MIGRATIONS[i]}\nPRAGMA user_version = {i + 1};\nCOMMIT;")
+            except BaseException:
+                if c.in_transaction:
+                    c.execute("ROLLBACK")
+                raise
+        _migrees.add(chemin)
 
 
 @contextmanager

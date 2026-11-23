@@ -506,6 +506,7 @@
     app.innerHTML = `${barre()}
       <main class="accueil editeur">
         <h1>Éditeur de cartes</h1>
+        <p class="sous-titre" id="e-usage"></p>
         <p class="sous-titre">Clique sur la carte pour poser des lieux, ou trace une zone. Seuls les endroits où Street View existe sont gardés.</p>
         <div class="reglages">
           <label>Nom de la carte <input id="e-nom" maxlength="40"></label>
@@ -560,6 +561,10 @@
       } catch (err) { m.textContent = err.message; m.hidden = false; }
       b.disabled = false; b.textContent = "Créer la carte";
     };
+    api("/api/admin/usage").then((u) => {
+      document.getElementById("e-usage").textContent = "Images Street View aujourd'hui : " + u.aujourdhui +
+        (u.plafond ? " sur " + u.plafond : " (pas de plafond réglé)") + ".";
+    }).catch(() => {});
     app.querySelectorAll(".archiver").forEach((b) => { b.onclick = async () => {
       try { await api("/api/admin/cartes/" + encodeURIComponent(b.dataset.id), "SUPPRIMER"); cartes = (await api("/api/cartes")).cartes; await pageEditeur(); }
       catch (err) { m.textContent = err.message; m.hidden = false; }

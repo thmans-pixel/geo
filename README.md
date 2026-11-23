@@ -43,3 +43,16 @@ Le site lit l'identifiant de la personne connectée dans un en-tête posé par l
 2. Ajouter les contours de pays : voir `serveur/donnees/LISEZMOI.md`.
 3. Remplir les réserves de lieux : `OUSUISJE_GOOGLE_KEY_OUTIL=… python3 outils/generer_reserve.py --toutes`
 4. Lancer : `OUSUISJE_IMAGES=google OUSUISJE_GOOGLE_KEY=… python3 -m uvicorn serveur.app:app --port 8000`
+
+## Mise en ligne (geo.izicraft.fr)
+
+Tout est dans `deploiement/` : service systemd, configuration nginx pour YunoHost, exemple d'environnement (sans secret)
+et `LISEZMOI.md` (clés Google, plafond de quota, vérifications à la main).
+
+- **Plafond d'images** : `OUSUISJE_PLAFOND_IMAGES` (images par jour, jour de Paris). Le vrai garde-fou est le quota réglé chez Google ;
+  ce compteur arrête le jeu proprement avec « Plus d'images pour aujourd'hui, reviens demain. » (page administrateur : usage du jour).
+- **Protections** : en-têtes de sécurité, `X-Requete` exigé sur tous les POST/PUT/DELETE de `/api`, limites de débit par adresse
+  (création de parties, défis, salons, codes de salon faux, connexions WebSocket), cookie `secure` en production,
+  pseudos refusés (liste de base + fichier `OUSUISJE_PSEUDOS_REFUSES`).
+- **Rétention** : parties d'invités effacées après 90 jours, parties de comptes après 365 jours (purge quotidienne) ; records et succès restent.
+- **Vie privée** : page `/vie-privee.html`, lien en bas de chaque écran.

@@ -277,3 +277,24 @@ plantage d'un 2 contre 2 quand un joueur part (corrigé), lieux épuisés, 15 s 
 **Cochés :** 23, 24, 25. **À vérifier à la main :** 27 (vraie coupure réseau), et tout l'essai réel avec le vrai serveur
 (`websockets`) : une partie de chaque mode à deux ou trois onglets.
 
+
+## Livraison — étape 4 (mise en ligne)
+**Fait (côté code) :** compteur d'images par jour (`quota.py`, table `usage_images`, plafond `OUSUISJE_PLAFOND_IMAGES`,
+message « Plus d'images pour aujourd'hui, reviens demain. » aussi côté navigateur si Google refuse), usage du jour dans la
+page administrateur ; en-têtes de sécurité, `X-Requete` exigé partout, limites de débit (parties, défis, salons, codes de
+salon faux, connexions WebSocket), cookie `secure`, pseudos refusés, purge quotidienne (invités 90 jours, comptes 365 jours),
+migrations atomiques ; page `/vie-privee.html` ; `deploiement/` (systemd, nginx, exemple d'environnement, guide pas à pas).
+Tests : `tests/test_mise_en_ligne.py` (11) ; suite complète verte.
+
+**Non coché volontairement :** 30 et 31. Ils ne se prouvent qu'en ligne : vraies clés Google avec quota réglé chez Google,
+partie à deux dont un en 4G, plafond mis très bas puis remis, et vérification qu'un en-tête `Remote-User` truqué par un
+visiteur anonyme est ignoré (voir `deploiement/LISEZMOI.md`).
+
+**Reporté (noté) :** file d'envoi bornée par membre, Content-Security-Policy, joueur exclu qui revient avec un nouveau cookie
+(invité), badge invité/compte dans le salon, exclusion d'un compte par l'administrateur.
+
+**Relecture gardien-enfants (corrigé) :** `--log-level warning` (sinon uvicorn journalise `WebSocket /ws/salons/CODE`), pas de journal nginx
+sur le site, `X-Forwarded-For` écrasé par nginx (limites de débit non contournables), blocage SQLite du compteur en mode Google,
+`Referrer-Policy` sans le code de salon, filtre de pseudos par mots (« Violette » passe), page vie privée complétée,
+`outils/supprimer_compte.py`, échec de purge signalé. **Reste à faire à la main avant l'ouverture :** test « en-tête truqué »
+(critère 16) et contrôle des journaux (voir `deploiement/LISEZMOI.md`). **Reporté :** CSP, pseudo refusé annoncé à l'enfant (aujourd'hui « Invité »).

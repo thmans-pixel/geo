@@ -29,6 +29,28 @@ def entete_utilisateur() -> str:
     return os.environ.get("OUSUISJE_ENTETE", "Remote-User")
 
 
+def plafond_images() -> int:
+    """Nombre maximal d'images (manches × personnes qui regardent) servies par jour ; 0 = pas de plafond côté jeu."""
+    try:
+        return max(0, int(os.environ.get("OUSUISJE_PLAFOND_IMAGES", "0")))
+    except ValueError:
+        return 0
+
+
+def cookie_secure() -> bool:
+    """Cookie réservé à HTTPS. Vrai par défaut en mode « google » (production) ; OUSUISJE_COOKIE_SECURE=0/1 pour forcer."""
+    v = os.environ.get("OUSUISJE_COOKIE_SECURE")
+    return (fournisseur_images() == "google") if v is None else v == "1"
+
+
+def duree_garde_invites_jours() -> int:
+    return int(os.environ.get("OUSUISJE_GARDE_INVITES_JOURS", "90"))
+
+
+def duree_garde_comptes_jours() -> int:
+    return int(os.environ.get("OUSUISJE_GARDE_COMPTES_JOURS", "365"))
+
+
 def secret_proxy() -> str:
     """Si réglé, le reverse proxy doit aussi poser l'en-tête X-Auth-Secret avec cette valeur."""
     return os.environ.get("OUSUISJE_SECRET_PROXY", "")

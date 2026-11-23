@@ -36,6 +36,10 @@
     }
     if (!config.cle_google) throw new Error("Clé Google absente : le jeu n'est pas configuré pour Street View.");
     await chargerGoogle(config.cle_google);
+    // Google signale un refus de clé (quota du jour atteint, clé limitée…) par cette fonction globale.
+    window.gm_authFailure = function () {
+      el.innerHTML = '<div class="pano-factice"><div class="pano-factice-texte">Plus d\'images pour aujourd\'hui, reviens demain.</div></div>';
+    };
     const libre = contrainte === "libre", fige = contrainte === "fige";
     const pano = new google.maps.StreetViewPanorama(el, {
       pano: image.pano_id,

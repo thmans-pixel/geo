@@ -12,6 +12,9 @@ def environnement(tmp_path, monkeypatch):
     monkeypatch.setenv("OUSUISJE_BASE", str(tmp_path / "jeu.sqlite3"))
     monkeypatch.setenv("OUSUISJE_IMAGES", "factice")
     monkeypatch.setenv("OUSUISJE_PAYS", str(DONNEES / "pays_test.geojson"))
+    monkeypatch.setenv("OUSUISJE_PSEUDOS_REFUSES", str(tmp_path / "aucun.txt"))
+    from serveur import protection
+    protection.limiteur.reinitialiser()
 
 
 @pytest.fixture

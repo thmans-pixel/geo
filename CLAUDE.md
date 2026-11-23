@@ -6,7 +6,7 @@ Spec de référence : `docs/specs/001-jeu-geoguessr.md`. Tout le texte visible e
 ## Lancer et tester
 - Essai sans rien payer : `OUSUISJE_IMAGES=factice python3 -m uvicorn serveur.app:app --port 8000`
 - Tests : `python3 -m pytest tests -q` (les tests `test_ui.py` ont besoin de Chrome et de playwright).
-- Variables : `OUSUISJE_ENTETE`, `OUSUISJE_ADMIN`, `OUSUISJE_SECRET_PROXY`, `OUSUISJE_URL_CONNEXION`, `OUSUISJE_COMPTE_ESSAI` (comptes, voir README), `OUSUISJE_IMAGES` (factice|google), `OUSUISJE_GOOGLE_KEY` (navigateur), `OUSUISJE_GOOGLE_KEY_OUTIL` (serveur), `OUSUISJE_BASE`, `OUSUISJE_PAYS`, `OUSUISJE_RESERVES`.
+- Variables : `OUSUISJE_ENTETE`, `OUSUISJE_ADMIN`, `OUSUISJE_SECRET_PROXY`, `OUSUISJE_URL_CONNEXION`, `OUSUISJE_COMPTE_ESSAI` (comptes, voir README), `OUSUISJE_IMAGES` (factice|google), `OUSUISJE_GOOGLE_KEY` (navigateur), `OUSUISJE_GOOGLE_KEY_OUTIL` (serveur), `OUSUISJE_BASE`, `OUSUISJE_PAYS`, `OUSUISJE_RESERVES`, `OUSUISJE_PLAFOND_IMAGES`, `OUSUISJE_COOKIE_SECURE`, `OUSUISJE_PSEUDOS_REFUSES`.
 
 ## Règles à ne jamais casser
 1. **Le serveur décide de tout** : score, distance, pays, éliminations. Le navigateur n'envoie que le point cliqué.
@@ -26,6 +26,10 @@ Spec de référence : `docs/specs/001-jeu-geoguessr.md`. Tout le texte visible e
 8. **Le chat n'est jamais enregistré** (`serveur/salons.py`) : ni base, ni journal, ni historique renvoyé à un nouvel arrivant.
    Ne jamais journaliser un message, ne jamais l'afficher en HTML (`textContent` seulement : pas de lien cliquable).
    Un salon se rejoint par code seulement (pas de liste de salons). L'état envoyé aux joueurs ne contient aucune coordonnée avant la fin de manche.
+
+9. **Mise en ligne** (`serveur/protection.py`, `serveur/quota.py`) : les POST de `/api` exigent `X-Requete` pour tous (middleware, pas route par route).
+   Aucune image Street View hors manche : toute création de manche passe par `quota.consommer`. `--no-access-log` ET `--log-level warning` en production : au niveau info, uvicorn
+   écrit `WebSocket /ws/salons/CODE` dans le journal ; nginx n'a pas de journal d'accès sur le site. Un seul processus uvicorn. Secrets seulement dans `/etc/ou-suis-je.env`.
 
 ## Pièges connus
 - `ISO_A2` vaut `-99` pour la France et la Norvège dans Natural Earth : `geo._code` lit `ISO_A2_EH` d'abord.

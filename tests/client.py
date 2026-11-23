@@ -5,7 +5,7 @@ import json
 
 class Client:
     def __init__(self, app, entetes=None):
-        self.app, self.cookies, self.entetes = app, {}, dict(entetes or {})
+        self.app, self.cookies, self.entetes = app, {}, {"X-Requete": "ou-suis-je", **(entetes or {})}
 
     async def _appel(self, methode, chemin, corps):
         donnees = json.dumps(corps).encode() if corps is not None else b""

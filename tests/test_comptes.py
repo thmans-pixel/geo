@@ -71,6 +71,7 @@ def test_invite_et_membre(app):  # critère 16
 
 def test_pseudo_du_compte_et_csrf(app):
     c = membre(app)
+    c.entetes.pop("X-Requete")
     assert c.post("/api/moi/pseudo", {"pseudo": "Zoé"})[0] == 400          # sans l'en-tête X-Requete
     c.entetes.update(H)
     assert c.post("/api/moi/pseudo", {"pseudo": "Zoé"})[1]["pseudo"] == "Zoé"
@@ -108,7 +109,9 @@ def test_admin_reserve(app, monkeypatch):  # critère 20
     assert membre(app, "leo").get("/api/admin/cartes")[0] == 403
     corps = {"nom": "Valence", "mode": "zone", "nombre": 8,
              "zone": [[44.90, 4.85], [44.90, 4.95], [44.97, 4.95], [44.97, 4.85]]}
-    assert membre(app).post("/api/admin/cartes", corps)[0] == 400          # sans X-Requete
+    sans = membre(app)
+    sans.entetes.pop("X-Requete")
+    assert sans.post("/api/admin/cartes", corps)[0] == 400                 # sans X-Requete
     assert membre(app, "leo", **H).post("/api/admin/cartes", corps)[0] == 403
 
 

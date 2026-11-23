@@ -9,7 +9,7 @@ import re
 import secrets
 import unicodedata
 
-from .. import base, config, horloge
+from .. import base, config, horloge, quota
 from . import cartes, fiches, geo, lieux as lieux_mod, profil, progression, score
 
 NB_MANCHES = 5
@@ -31,7 +31,25 @@ class ErreurJeu(Exception):
 def nettoyer_pseudo(pseudo) -> str:
     p = "".join(ch for ch in str(pseudo or "") if unicodedata.category(ch) not in ("Cc", "Cf", "Co", "Cs"))
     p = re.sub(r"\s+", " ", p).strip()[:20]
-    return p or "Invité"
+    return "Invité" if not p or pseudo_refuse(p) else p
+
+
+def _lettres(texte) -> str:
+    """Le texte sans accents, en minuscules, sans chiffres ni signes : « P0u-ta1n » → « putain »-like, pour comparer."""
+    t = unicodedata.normalize("NFKD", texte).encode("ascii", "ignore").decode().lower()
+    t = t.translate(str.maketrans("0134578$@", "oleatbsta"))
+    return re.sub(r"[^a-z]", "", t)
+
+
+def pseudo_refuse(pseudo) -> bool:
+    """Vrai si le pseudo contient un mot refusé (insultes, grossièretés) : le jeu est ouvert aux enfants."""
+    from .. import pseudos
+    lettres = _lettres(pseudo)
+    if any(mot in lettres for mot in pseudos.mots_refuses()):
+        return True
+    entiers = set(pseudos.mots_entiers())
+    mots = [_lettres(m) for m in re.split(r"[\s_.\-]+", str(pseudo))]
+    return any(m.rstrip("sx") in entiers or m in entiers for m in mots + [lettres] if m)
 
 
 def _carte(carte_id) -> dict:
@@ -155,6 +173,7 @@ def creer_partie(joueur_id, mode, carte_id=None, contrainte="libre", chrono=0, p
                 if mode == "serie":
                     _pays()
                 liste = [_lieux(lieux_mod.tirer_un, carte_id, set(), random.SystemRandom())]
+        quota.consommer(1, c)                           # la première manche charge une image
         ident_partie = secrets.token_urlsafe(9)
         now = horloge.maintenant()
         c.execute("INSERT INTO parties (id, joueur_id, pseudo, mode, carte, contrainte, chrono, defi_id, "
@@ -324,6 +343,7 @@ def suivante(joueur_id, partie_id) -> None:
             raise ErreurJeu(409, "Réponds d'abord à cette manche.")
         if p["statut"] == "terminee":
             raise ErreurJeu(409, "La partie est terminée.")
+        quota.consommer(1, c)
         numero = p["manche"] + 1
         liste = json.loads(p["lieux_json"])
         if p["nb_manches"]:

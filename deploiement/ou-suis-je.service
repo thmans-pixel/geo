@@ -1,0 +1,24 @@
+# /etc/systemd/system/ou-suis-je.service
+# UN SEUL processus : les salons vivent en mémoire (pas de --workers).
+# --log-level warning est INDISPENSABLE : au niveau info, uvicorn écrit « WebSocket /ws/salons/CODE » dans le journal.
+[Unit]
+Description=Où suis-je ? (jeu de géolocalisation)
+After=network.target
+
+[Service]
+User=ou-suis-je
+Group=ou-suis-je
+WorkingDirectory=/opt/ou-suis-je
+# Les secrets sont dans ce fichier (chmod 600, propriétaire root), JAMAIS dans le dépôt.
+EnvironmentFile=/etc/ou-suis-je.env
+ExecStart=/opt/ou-suis-je/venv/bin/python -m uvicorn serveur.app:app --host 127.0.0.1 --port 8000 --no-access-log --log-level warning --ws-max-size 4096 --proxy-headers --forwarded-allow-ips 127.0.0.1
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/ou-suis-je
+
+[Install]
+WantedBy=multi-user.target

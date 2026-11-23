@@ -150,3 +150,7 @@ input, select { font: inherit; padding: .5rem .6rem; border-radius: 8px; border:
 .feedback { margin: 0; font-size: .9rem; background: #0f1b2de6; border-radius: 8px; padding: .3rem .6rem; }
 .feedback:empty { display: none; }
 li.elimine, tr.elimine { opacity: .55; text-decoration: line-through; }
+
+.pied { text-align: center; padding: 1.5rem 1rem 5rem; font-size: .85rem; }
+.pied a { color: inherit; opacity: .7; }
+.vie-privee { max-width: 40rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }

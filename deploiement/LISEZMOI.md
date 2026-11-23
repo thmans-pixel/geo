@@ -40,7 +40,11 @@ Avec la clé serveur : `OUSUISJE_GOOGLE_KEY_OUTIL=… python3 outils/generer_res
 ## 5. Domaine et nginx (YunoHost)
 1. Ajouter le domaine `geo.izicraft.fr` dans YunoHost (certificat Let's Encrypt).
 2. Placer `nginx-geo.conf` dans `/etc/nginx/conf.d/geo.izicraft.fr.d/`, mettre le même secret que dans `/etc/ou-suis-je.env`, `nginx -t`, recharger.
-3. Le jeu doit rester ouvert aux invités : l'accès ne doit pas être réservé aux comptes dans YunoHost (permission « visiteurs »).
+3. Le jeu doit rester ouvert aux invités tout en reconnaissant les comptes : dans `/etc/ssowat/conf.json.persistent`, ajouter sous `permissions`
+   `"custom_geo": {"public": true, "auth_header": true, "users": [], "uris": ["geo.izicraft.fr/"]}` puis `sudo yunohost app ssowatconf`.
+4. SSOwat ne retire PAS un `Remote-User` envoyé par un visiteur anonyme : c'est `more_clear_input_headers` (déjà dans `nginx-geo.conf`) qui le fait.
+   Le test « en-tête truqué » ci-dessous est obligatoire après toute modification d'nginx ou de SSOwat.
+5. Le fichier de la base doit appartenir à `ou-suis-je` : ne jamais lancer `outils/` en root sans `chown ou-suis-je: /var/lib/ou-suis-je/jeu.sqlite3*` ensuite.
 
 ## 6. Vérifications à la main
 - **Journaux sans code de salon** : après une partie en salon, `journalctl -u ou-suis-je | grep -iE "ws/|salon"` et `grep -ri "salon=" /var/log/nginx/` ne doivent rien renvoyer (y compris les journaux de YunoHost pour le domaine).

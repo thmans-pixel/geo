@@ -334,6 +334,7 @@ def test_salon_a_deux_avec_chat_et_spectateur(site_salon, navigateur):  # critè
     entrer_salon(b, site, code.lower(), "Ami")
     entrer_salon(s, site, code, "Curieux", spectateur=True)
     a.wait_for_selector("#lancer:not([disabled])")
+    a.wait_for_selector(".membres:has-text('Curieux')")
     assert "Curieux" in a.inner_text(".membres") and "spectateur" in a.inner_text(".membres")
     b.wait_for_selector(".membres")
     assert b.locator("#lancer").count() == 0                           # seul l'hôte lance
@@ -373,3 +374,70 @@ def test_salon_a_deux_avec_chat_et_spectateur(site_salon, navigateur):  # critè
         assert not p.erreurs, p.erreurs
     for c in (ctx_a, ctx_b, ctx_s):
         c.close()
+
+
+def creer_salon_ui(page, site, pseudo="Hôte"):
+    page.goto(site)
+    page.wait_for_selector(".modes")
+    page.click('.mode[data-mode="salon"]')
+    page.select_option('select[name="carte"]', "drome-ardeche")
+    page.click("#jouer")
+    page.fill('#entree input[name="pseudo"]', pseudo)
+    page.click("#entree button")
+    page.wait_for_selector("#code-salon")
+    return page.inner_text("#code-salon").strip()
+
+
+def test_duel_a_deux_navigateurs(site_salon, navigateur):  # critère 23
+    site = site_salon
+    ctx_a, a = nouvelle_page(navigateur, site)
+    ctx_b, b = nouvelle_page(navigateur, site)
+    code = creer_salon_ui(a, site)
+    entrer_salon(b, site, code, "Rival")
+    a.wait_for_selector("#lancer:not([disabled])")
+    a.select_option("#r-mode", "duel")
+    a.wait_for_selector("#aide-mode:has-text('6 000 points de vie')")
+    assert "équipe" in a.inner_text(".membres")
+    a.click("#lancer")
+    for p in (a, b):
+        p.wait_for_selector("#hud-pv .pv-cote")
+        assert p.locator(".pv-cote").count() == 2 and p.inner_text("#hud-pv").count("000 PV") == 2
+    poser_repere(a, 0.5, 0.5); a.click("#valider")
+    b.wait_for_selector("#hud-urgence:has-text('le temps presse')")        # compte à rebours de 15 s pour l'autre
+    poser_repere(b, 0.9, 0.9); b.click("#valider")
+    for p in (a, b):
+        p.wait_for_selector("#bloc-duel")
+        assert "perd" in p.inner_text("#bloc-duel") or "Égalité" in p.inner_text("#bloc-duel")
+    a.click("#suivante")
+    b.wait_for_selector("#valider")
+    assert not a.erreurs and not b.erreurs, (a.erreurs, b.erreurs)
+    ctx_a.close(); ctx_b.close()
+
+
+def test_bataille_royale_pays_a_trois(site_salon, navigateur):  # critère 25
+    site = site_salon
+    ctxs = [nouvelle_page(navigateur, site) for _ in range(3)]
+    (_, a), (_, b), (_, c) = ctxs
+    code = creer_salon_ui(a, site)
+    entrer_salon(b, site, code, "Deux")
+    entrer_salon(c, site, code, "Trois")
+    a.wait_for_selector(".membres:has-text('Trois')")
+    a.select_option("#r-mode", "br_pays")
+    a.wait_for_selector("#lancer:not([disabled])")
+    a.click("#lancer")
+    for p in (a, b, c):
+        p.wait_for_selector("#valider")
+        assert "Essais restants" in p.inner_text("#hud-feedback") or p.inner_text("#hud-feedback") == ""
+        poser_repere(p, 0.5, 0.5)
+        p.click("#valider")
+    for p in (a, b, c):
+        p.wait_for_selector("#res-carte")
+        assert "C'était" in p.inner_text(".res-panneau") and "trouvé" in p.inner_text(".res-panneau")
+    a.click("#suivante")
+    for p in (a, b, c):
+        p.wait_for_selector("#valider")
+        assert not p.erreurs, p.erreurs
+    for _, p in ctxs:
+        pass
+    for ctx, _ in ctxs:
+        ctx.close()

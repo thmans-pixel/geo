@@ -141,3 +141,12 @@ input, select { font: inherit; padding: .5rem .6rem; border-radius: 8px; border:
 .salon { position: relative; min-height: 100vh; }
 #salon-bandeau { position: fixed; top: 3.5rem; left: .75rem; z-index: 40; max-width: 80%; }
 .salon .accueil { padding-bottom: 24rem; }   /* de la place sous le contenu pour le chat ouvert */
+
+.hud-pv { position: absolute; top: .75rem; left: 50%; transform: translateX(-50%); z-index: 10; min-width: min(480px, 90vw); }
+.pv { display: grid; gap: .3rem; background: #0f1b2dcc; border-radius: 8px; padding: .4rem .7rem; }
+.pv-cote { display: grid; grid-template-columns: 7rem 1fr 5.5rem; gap: .5rem; align-items: center; font-size: .9rem; }
+.pv .jauge div { background: var(--rouge); transition: width .4s; }
+.urgence { position: absolute; top: 6rem; left: 50%; transform: translateX(-50%); z-index: 10; margin: 0; color: #ffd27a; font-weight: 600; text-shadow: 0 1px 3px #000; }
+.feedback { margin: 0; font-size: .9rem; background: #0f1b2de6; border-radius: 8px; padding: .3rem .6rem; }
+.feedback:empty { display: none; }
+li.elimine, tr.elimine { opacity: .55; text-decoration: line-through; }

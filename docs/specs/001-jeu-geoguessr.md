@@ -112,11 +112,11 @@ Chacun se vérifie par un test automatique ou par une manipulation précise.
     — *Vérification :* 3 navigateurs sur le même salon.
 22. [x] En Partie entre amis, tout le monde voit la même image en même temps ; à la fin de la manche, les
     repères de tous s'affichent avec un classement. — *Vérification :* 3 navigateurs.
-23. [ ] Le Duel applique la règle des points de vie et du multiplicateur ; l'adversaire voit un compte à rebours
+23. [x] Le Duel applique la règle des points de vie et du multiplicateur ; l'adversaire voit un compte à rebours
     de 15 s dès la première réponse. — *Vérification :* test automatique de la règle + 2 navigateurs.
-24. [ ] Duel en équipes 2 contre 2 : c'est la meilleure réponse de chaque équipe qui compte.
+24. [x] Duel en équipes 2 contre 2 : c'est la meilleure réponse de chaque équipe qui compte.
     — *Vérification :* test automatique.
-25. [ ] Bataille royale distance et pays : éliminations conformes aux règles du tableau ; les éliminés restent
+25. [x] Bataille royale distance et pays : éliminations conformes aux règles du tableau ; les éliminés restent
     en spectateurs. — *Vérification :* test automatique + 3 navigateurs.
 26. [x] On peut rejoindre un salon en **spectateur** (voit tout, ne joue pas). — *Vérification :* manipulation.
 27. [ ] Un joueur dont la connexion coupe moins de 60 s reprend sa place ; au-delà, il est retiré et la
@@ -255,4 +255,25 @@ membre retiré encore actif, héritier de l'hôte resté muet, pseudos en double
 d'origine), `--no-access-log`, limite d'essais de codes de salon par IP, file d'envoi bornée par personne (un lecteur lent
 retarde les autres), plafond du critère 31 qui couvre aussi les spectateurs (chacun charge l'image), un invité exclu peut
 revenir avec un cookie neuf (parade : verrouiller le salon), badge « invité / compte » dans le chat.
+
+## Livraison — étape 3, lot 2 (Duel, équipes, Batailles royales)
+**Fait :** choix du mode dans le salon (Partie entre amis, Duel, Bataille royale « distance », Bataille royale « pays »),
+changement joueur ↔ spectateur avant le lancement.
+- **Duel** : 6 000 PV ; le moins précis perd l'écart de score × multiplicateur (×1 aux manches 1 à 4, ×1,5 à la 5ᵉ,
+  puis +0,5 par manche) ; égalité = aucun dégât ; dès la première réponse, les autres ont 15 s (marge de 1 s pour les
+  réponses en vol) ; l'abandon d'un joueur (plus de 60 s hors ligne) donne la victoire à l'autre.
+- **2 contre 2** : équipes A et B composées par l'hôte (2 et 2 obligatoires), la meilleure réponse de chaque équipe compte,
+  les PV sont ceux de l'équipe.
+- **Bataille royale « distance »** : le plus loin est éliminé à chaque manche ; sans réponse = éliminé avant tout autre ;
+  si plusieurs n'ont pas répondu, c'est le dernier arrivé dans le salon (règle arbitraire, à confirmer) ; un départ compte
+  comme une élimination.
+- **Bataille royale « pays »** : 3 essais par manche (le serveur dit seulement juste/faux et le nom du pays cliqué), qui
+  échoue perd une vie sur 3 ; si tout le monde perdrait sa dernière vie en même temps, la partie s'arrête sur une égalité.
+- Les éliminés restent dans le salon en spectateurs (ils voient la suite et peuvent écrire). Un lieu n'est jamais rejoué
+  dans une même partie ; s'il n'y en a plus, la partie s'arrête (Duel : le plus de PV gagne).
+100 tests verts, dont un Duel à 2 navigateurs et une Bataille royale « pays » à 3 navigateurs. Relecture indépendante faite :
+plantage d'un 2 contre 2 quand un joueur part (corrigé), lieux épuisés, 15 s réelles du Duel, message d'urgence.
+
+**Cochés :** 23, 24, 25. **À vérifier à la main :** 27 (vraie coupure réseau), et tout l'essai réel avec le vrai serveur
+(`websockets`) : une partie de chaque mode à deux ou trois onglets.
 

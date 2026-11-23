@@ -6,7 +6,8 @@ Un jeu de géolocalisation façon GeoGuessr, en français, pour jouer en famille
 **Comptes** : les comptes sont ceux de YunoHost (aucune inscription sur le site, aucun mot de passe stocké). Une fois connecté :
 profil, statistiques, succès, niveaux, classements. L'administrateur dispose en plus d'un éditeur de cartes.
 **Partie entre amis** : un salon avec un code à 6 caractères, 2 à 10 joueurs, spectateurs, chat écrit (jamais enregistré),
-reconnexion en moins de 60 s. (Duel, équipes et Batailles royales arrivent au lot suivant ; la mise en ligne à l'étape 4.)
+reconnexion en moins de 60 s. **Duel** (1 contre 1, ou 2 contre 2 en équipes : la meilleure réponse de chaque équipe compte) et **Batailles royales**
+(« distance » : le plus loin est éliminé ; « pays » : 3 essais et 3 vies par personne) se choisissent dans le salon. (Mise en ligne : étape 4.)
 
 ## Essayer tout de suite (sans compte Google, sans rien payer)
 

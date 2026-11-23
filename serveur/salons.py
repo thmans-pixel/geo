@@ -12,7 +12,7 @@ import re
 import secrets
 import unicodedata
 
-from . import config, horloge
+from . import config, horloge, quota
 from .jeu import cartes, fiches, geo, lieux as lieux_mod, score
 from .jeu.moteur import TOLERANCE_PAYS_KM, ErreurJeu, _carte, _lieux, _pays, _reglages
 
@@ -328,6 +328,8 @@ class Salon:
             raise
 
     def _demarrer_manche(self):
+        # chaque personne présente (joueurs et spectateurs) charge l'image : on les compte toutes
+        quota.consommer(max(1, sum(1 for m in self.membres.values() if m.connecte)))
         if self.mode != "amis":
             deja = {l["id"] for l in self.lieux}
             try:

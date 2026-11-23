@@ -101,6 +101,7 @@ def test_au_moins_deux_joueurs_et_dix_au_plus():
 def test_creation_http_exige_l_en_tete_et_limite_par_hote():
     c = Client(creer_app())
     c.get("/api/config")                                    # pose le cookie invité
+    c.entetes.pop("X-Requete")
     assert c.post("/api/salons", {"carte": "monde"})[0] == 400
     c.entetes["X-Requete"] = "ou-suis-je"
     statut, r = c.post("/api/salons", {"carte": "monde"})
